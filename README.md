@@ -1,0 +1,39 @@
+# Sublime Salesforce Reference
+
+A plugin for Sublime Text that gives you quick access to Salesforce Documentation from Sublime Text.
+
+## Installation
+
+1. **Recommended:** Download [Package Control](http://wbond.net/sublime_packages/package_control) and install using the *Package Control: Install Package* command (search for *Salesforce Reference*)
+2. **Not recommended:** Simply download this repo and save it to a *SublimeSalesforceReference* directory inside your Sublime Packages/ directory. You will not receive automatic updates as you would following option 1
+
+## Usage 
+
+SublimeSalesforceReference adds a new command to your palette: *'Salesforce Reference'*. Simply select this command, and wait for a few moments for the plugin to retrieve an index of reference pages from Salesforce. At this point, a quick panel will pop up list documentation options; search for what you're after, press enter, and the documentation page will open in your web browser
+
+![](/doc/img/usage.png)
+
+## Contributing, Bugs, Suggestions, Questions
+
+If you have any suggestions or bugs to report, please open an issue and I'll take a look ASAP. If you have any questions or would like to contribute in any way, you can also get in touch with me by tweeting [@Oblongmana](http://twitter.com/oblongmana), or go ahead and fork the repo and submit a pull request.
+
+## License
+
+Copyright (c) 2014 James Hill <oblongmana@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+## Credits
+
+All Salesforce Documentation is © Copyright 2000–2014 salesforce.com, inc.

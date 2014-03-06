@@ -1,0 +1,7 @@
+Sublime Force Reference 1.0.0 Release Notes:
+
+Enhancements:
+ - All commands now run asynchronously, showing a message in the status bar
+
+Bug Fixes:
+ - The "My Sites" Command now also checks for an http:// prefix and adds if missing

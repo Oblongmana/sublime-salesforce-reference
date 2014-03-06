@@ -1,0 +1,6 @@
+#OSX-specific exclusions
+.[dD][sS]_[sS]tore
+
+#Sublime nature exclusions
+*.sublime-workspace
+*.sublime-project
