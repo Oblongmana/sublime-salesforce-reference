@@ -37,3 +37,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ## Credits
 
 All Salesforce Documentation is © Copyright 2000–2014 salesforce.com, inc.
+
+Credit to [Luke McFarlane](https://github.com/lukemcfarlane) for the inspiration!
