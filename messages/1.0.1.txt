@@ -1,0 +1,4 @@
+Sublime Force Reference 1.0.1 Release Notes:
+
+Bug Fixes:
+ - Change README image to hosted on personal site instead of relative github reference, so image not broken on package control site

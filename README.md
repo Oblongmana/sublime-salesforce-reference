@@ -11,7 +11,7 @@ A plugin for Sublime Text that gives you quick access to Salesforce Documentatio
 
 SublimeSalesforceReference adds a new command to your palette: *'Salesforce Reference'*. Simply select this command, and wait for a few moments for the plugin to retrieve an index of reference pages from Salesforce. At this point, a quick panel will pop up list documentation options; search for what you're after, press enter, and the documentation page will open in your web browser
 
-![](/doc/img/usage.png)
+![](http://oblongmana.com/images/doc/sublime-salesforce-reference/usage.png)
 
 ## Contributing, Bugs, Suggestions, Questions
 
