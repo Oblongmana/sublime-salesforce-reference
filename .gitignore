@@ -4,3 +4,6 @@
 #Sublime nature exclusions
 *.sublime-workspace
 *.sublime-project
+
+#General Exclusions
+notes/*
