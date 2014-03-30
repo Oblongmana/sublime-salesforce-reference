@@ -1,0 +1,4 @@
+Sublime Salesforce Reference 1.2.0 Release Notes:
+
+Enhancements:
+ - Salesforce Reference index is now cached when the plugin loads, or if the cache is otherwise empty for some reason. As such, successive calls to the reference command should happen without delay, instead of calling out each time!
