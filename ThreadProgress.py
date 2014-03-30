@@ -1,3 +1,4 @@
+"""MIT License, Will Bond <will@wbond.net>, see README.md for full info"""
 import sublime
 
 

@@ -1,4 +1,4 @@
-Sublime Force Reference 1.0.0 Release Notes:
+Sublime Salesforce Reference 1.0.0 Release Notes:
 
 Enhancements:
  - All commands now run asynchronously, showing a message in the status bar

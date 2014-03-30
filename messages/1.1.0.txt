@@ -1,0 +1,4 @@
+Sublime Salesforce Reference 1.1.0 Release Notes:
+
+Enhancements:
+ - Command now runs in a thread with progress indicator that properly tracks thread
