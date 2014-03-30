@@ -1,0 +1,4 @@
+Sublime Salesforce Reference 1.1.1 Release Notes:
+
+Bug Fixes:
+ - Fix reference to open_documentation - last push broke functionality
