@@ -19,9 +19,11 @@ class SalesforceReferenceCache():
 reference_cache = SalesforceReferenceCache()
 
 def plugin_loaded():
-    thread = RetrieveIndexThread(sublime.active_window(),False)
-    thread.start()
-    ThreadProgress(thread, 'Retrieving Salesforce Reference Index...', '')
+    settings = sublime.load_settings("SublimeSalesforceReference.sublime-settings")
+    if settings != None and settings.get("refreshCacheOnLoad") == True:
+        thread = RetrieveIndexThread(sublime.active_window(),False)
+        thread.start()
+        ThreadProgress(thread, 'Retrieving Salesforce Reference Index...', '')
 
 
 class SalesforceReferenceCommand(sublime_plugin.WindowCommand):

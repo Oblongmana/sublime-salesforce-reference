@@ -1,0 +1,26 @@
+[{
+	"caption": "Preferences",
+	"id": "preferences",
+	"mnemonic": "n",
+	"children": [{
+		"caption": "Package Settings",
+		"id": "package-settings",
+		"mnemonic": "P",
+		"children": [{
+			"caption": "Salesforce Reference",
+			"children": [{
+				"caption": "Settings – Default",
+				"command": "open_file",
+				"args": {
+					"file": "${packages}/SublimeSalesforceReference/SublimeSalesforceReference.sublime-settings"
+				}
+			}, {
+				"caption": "Settings – User",
+				"command": "open_file",
+				"args": {
+					"file": "${packages}/User/SublimeSalesforceReference.sublime-settings"
+				}
+			}]
+		}]
+	}]
+}]
