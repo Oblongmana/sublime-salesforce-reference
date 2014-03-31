@@ -1,0 +1,4 @@
+Sublime Salesforce Reference 1.3.0 Release Notes:
+
+Enhancements:
+ - Make cache refresh on plugin load configurable via a setting (from a pull request from @lukemcfarlane), allowing you to disable the automatic caching that happens when the plugin is loaded. By default, caching will happen when the plugin is loaded, but you may want to disable this behaviour if you often don't need to use Salesforce Reference (though it should be noted there isn't any real overhead to allowing it to cache on load)
