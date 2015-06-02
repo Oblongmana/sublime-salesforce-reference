@@ -1,0 +1,18 @@
+Sublime Salesforce Reference 1.4.0 Release Notes:
+
+Re-engineering:
+  - Modify Table of Contents retrieval to use page scraping
+    - Salesforce has done away with the publically accessible XML Table of 
+      Contents files we previously utilised to work out what articles to 
+      present and where to link to.
+      
+      As such, we now have to scrape the Table of Contents out of the public 
+      facing doc site. For a more technical explanation see commit notes here: 
+      https://github.com/Oblongmana/sublime-salesforce-reference/commit/c4cb7c008e50c4ec4e3fb86b341b13ce1e07baea
+
+    - The primary impact here will be that getting the table of contents runs 
+      a little slower: due to the overhead of retrieving a whole web page 
+      intended for human users. You hopefully shouldn't notice a difference, 
+      but if you run into any problems, please log an issue at https://github.
+      com/Oblongmana/sublime-salesforce-reference/issues, and/or tweet at me 
+      at https://twitter.com/oblongmana
