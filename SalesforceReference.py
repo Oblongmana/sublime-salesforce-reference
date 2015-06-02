@@ -1,8 +1,8 @@
 """SublimeSalesforceReference: Quick access to Salesforce Documentation from Sublime Text"""
 __version__ = "1.2.0"
 __author__ = "James Hill (oblongmana@gmail.com)"
-__copyright__ = "SublimeSalesforceReference: (C) 2014 James Hill. GNU GPL 3."
-__credits__ = ["All Salesforce Documentation is © Copyright 2000–2014 salesforce.com, inc.", "ThreadProgress.py is under the MIT License, Will Bond <will@wbond.net>, and SalesforceReference.py's RetrieveIndexThread method is a derives in part from code under the same license"]
+__copyright__ = "SublimeSalesforceReference: (C) 2014-2015 James Hill. GNU GPL 3."
+__credits__ = ["All Salesforce Documentation is © Copyright 2000–2015 salesforce.com, inc.", "ThreadProgress.py is under the MIT License, Will Bond <will@wbond.net>, and SalesforceReference.py's RetrieveIndexThread method is a derives in part from code under the same license"]
 
 import sublime, sublime_plugin
 import urllib

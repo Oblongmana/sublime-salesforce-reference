@@ -40,7 +40,7 @@ If you have any suggestions or bugs to report, please open an issue and I'll tak
 
 ## License
 
-Copyright (c) 2014 James Hill <oblongmana@gmail.com>
+Copyright (c) 2014-2015 James Hill <oblongmana@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-ThreadProgress.py is licensed under the MIT license, and SalesforceReference.py's RetrieveIndexThread method is a derives in part from code under the same license
+ThreadProgress.py is licensed under the MIT license, and SalesforceReference.py's RetrieveIndexThread method derives in part from code under the same license
 
 Copyright (c) 2011-2013 Will Bond <will@wbond.net>
 
@@ -69,6 +69,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ## Credits
 
-All Salesforce Documentation is © Copyright 2000–2014 salesforce.com, inc.
+All Salesforce Documentation is © Copyright 2000–2015 salesforce.com, inc.
 
 Credit to [Luke McFarlane](https://github.com/lukemcfarlane) for the inspiration!
