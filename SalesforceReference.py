@@ -29,7 +29,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), os.path.normpath("lib"))
 from bs4 import BeautifulSoup
 import html.parser
 
-SALESFORCE_DOC_URL_BASE = 'http://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/'
+SALESFORCE_APEX_DOC_URL_BASE = "http://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/"
+SALESFORCE_VISUALFORCE_DOC_URL_BASE = "http://developer.salesforce.com/docs/atlas.en-us.pages.meta/pages/"
 
 class SalesforceReferenceCache(collections.MutableSequence):
     """
@@ -69,33 +70,35 @@ class SalesforceReferenceCache(collections.MutableSequence):
         return repr(self.entries)
 
 class SalesforceReferenceCacheEntry(object):
-    def __init__(self,title,url):
+    def __init__(self,title,url,docType):
         self.title = title
         self.url = url
+        self.docType = docType #Specify if is a Visualforce entry or Apex one
     """str and repr implemented for debugging"""
     def __str__(self):
-        return str({'title':self.title,'url':self.url})
+        return str({"title":self.title,"url":self.url})
     def __repr__(self):
-        return str({'title':self.title,'url':self.url})
-
+        return str({"title":self.title,"url":self.url})
 
 
 reference_cache = SalesforceReferenceCache()
 
-
 def plugin_loaded():
+    global settings 
     settings = sublime.load_settings("SublimeSalesforceReference.sublime-settings")
+    print("loading", settings.get("refreshCacheOnLoad"))
     if settings != None and settings.get("refreshCacheOnLoad") == True:
+        print("starting thread")
         thread = RetrieveIndexThread(sublime.active_window(),False)
         thread.start()
-        ThreadProgress(thread, 'Retrieving Salesforce Reference Index...', '')
+        ThreadProgress(thread, "Retrieving Salesforce Reference Index...", "")
 
 
 class SalesforceReferenceCommand(sublime_plugin.WindowCommand):
     def run(self):
         thread = RetrieveIndexThread(self.window)
         thread.start()
-        ThreadProgress(thread, 'Retrieving Salesforce Reference Index...', '')
+        ThreadProgress(thread, "Retrieving Salesforce Reference Index...", "")
 
 
 class RetrieveIndexThread(threading.Thread):
@@ -119,27 +122,63 @@ class RetrieveIndexThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
+        print("running thread")
         if not (reference_cache.entries):
-            sf_html = urllib.request.urlopen(urllib.request.Request(SALESFORCE_DOC_URL_BASE,None,{'User-Agent': 'Mozilla/5.0'})).read().decode('utf-8')
-            page_soup = BeautifulSoup(sf_html, 'html.parser')
-            reference_soup = page_soup.find_all(text='Reference',class_='toc-text')[0].parent.parent.next_sibling
-            leaf_soup_list = reference_soup.find_all(class_='leaf')
-            header_soup_list = map(lambda leaf: leaf.parent.previous_sibling,leaf_soup_list)
-            unique_header_soup_list = list()
-            for header_soup in header_soup_list:
-                if header_soup not in unique_header_soup_list:
-                    unique_header_soup_list.append(header_soup)
-                    header_data_tag = header_soup.find(class_='toc-a-block')
-                    reference_cache.append(
-                        SalesforceReferenceCacheEntry(
-                            header_data_tag.find(class_='toc-text').string,
-                            header_data_tag['href']
-                        )
-                    )
+            #Check if has to get APEX doc
+            print("chekcing apex",settings.get("apexDoc"))
+            if settings.get("apexDoc") == True:
+                self.__get_apex_doc()
+                
+            print("chekcing vf",settings.get("visualforceDoc"))
+            #Check if has to get Visualforce doc
+            if settings.get("visualforceDoc") == True:
+                self.__get_visualforce_doc()
+            
         if(self.open_when_done):
             self.window.show_quick_panel(reference_cache.titles, self.open_documentation)
+    
+    #Download VISUALFORCE doc entries
+    def __get_visualforce_doc(self):
+        print("getting vf")
+        sf_html = urllib.request.urlopen(urllib.request.Request(SALESFORCE_VISUALFORCE_DOC_URL_BASE,None,{"User-Agent": "Mozilla/5.0"})).read().decode("utf-8")
+        page_soup = BeautifulSoup(sf_html, "html.parser")
+        reference_soup = page_soup.find_all(text="Standard Component Reference",class_="toc-text")[0].parent.parent.parent
+        span_list = reference_soup.find_all("span", class_="toc-text")
+        for span in span_list:
+            link = span.parent
+            reference_cache.append(
+                    SalesforceReferenceCacheEntry(
+                        span.string,
+                        link["href"],
+                        "Visualforce"
+                    )
+                )
+    
+    #Download APEX doc entries
+    def __get_apex_doc(self):
+        print("getting ap")
+        sf_html = urllib.request.urlopen(urllib.request.Request(SALESFORCE_APEX_DOC_URL_BASE,None,{"User-Agent": "Mozilla/5.0"})).read().decode("utf-8")
+        page_soup = BeautifulSoup(sf_html, "html.parser")
+        reference_soup = page_soup.find_all(text="Reference",class_="toc-text")[0].parent.parent.next_sibling
+        leaf_soup_list = reference_soup.find_all(class_="leaf")
+        header_soup_list = map(lambda leaf: leaf.parent.previous_sibling,leaf_soup_list)
+        unique_header_soup_list = list()
+        for header_soup in header_soup_list:
+            if header_soup not in unique_header_soup_list:
+                unique_header_soup_list.append(header_soup)
+                header_data_tag = header_soup.find(class_="toc-a-block")
+                reference_cache.append(
+                    SalesforceReferenceCacheEntry(
+                        header_data_tag.find(class_="toc-text").string,
+                        header_data_tag["href"],
+                        "Apex"
+                    )
+                )
 
     def open_documentation(self, reference_index):
         if(reference_index != -1):
-            base_url= 'http://www.salesforce.com/us/developer/docs/apexcode'
-            webbrowser.open_new_tab(SALESFORCE_DOC_URL_BASE + reference_cache[reference_index].url)
+            # Check type of entriy (Apex or Visualforce)
+            if reference_cache[reference_index].docType == "Apex":
+                webbrowser.open_new_tab(SALESFORCE_APEX_DOC_URL_BASE + reference_cache[reference_index].url)
+            elif reference_cache[reference_index].docType == "Visualforce":
+                webbrowser.open_new_tab(SALESFORCE_VISUALFORCE_DOC_URL_BASE + reference_cache[reference_index].url)
