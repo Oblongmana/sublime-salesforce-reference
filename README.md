@@ -30,7 +30,17 @@ To edit your settings, go to Preferences > Package Settings > Salesforce Referen
     //      When set to true (RECOMMENDED, and the default setting), the
     //      plugin will cache the Reference Index when Sublime Text starts
     //      or the plugin is reloaded
-    "refreshCacheOnLoad": true 
+    "refreshCacheOnLoad": true,
+    
+    // apexDoc:
+    // Setting this to false means the plugin wont download Apex
+    // reference entries
+    "apexDoc": true,
+    
+    // visualforceDoc:
+    // Setting this to false means the plugin wont download Visualforce
+    // reference entries
+    "visualforceDoc": true
 }
 ```
 
