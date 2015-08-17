@@ -18,5 +18,10 @@
     // visualforceDoc:
     // Setting this to false means the plugin wont download Visualforce
     // reference entries
-    "visualforceDoc": false 
+    "visualforceDoc": false,
+    
+    // serviceConsoleDoc:
+    // Setting this to false means the plugin wont download Service Console
+    // Javascript toolkit reference entries
+    serviceConsoleDoc: false
 }

@@ -40,7 +40,12 @@ To edit your settings, go to Preferences > Package Settings > Salesforce Referen
     // visualforceDoc:
     // Setting this to false means the plugin wont download Visualforce
     // reference entries
-    "visualforceDoc": true
+    "visualforceDoc": true,
+    
+    // serviceConsoleDoc:
+    // Setting this to false means the plugin wont download Service Console
+    // Javascript toolkit reference entries
+    serviceConsoleDoc: true
 }
 ```
 

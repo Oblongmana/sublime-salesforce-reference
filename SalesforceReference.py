@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ElementTree
 import webbrowser
 import threading
 import collections
+import re
 from .ThreadProgress import ThreadProgress
 
 # Import BeautifulSoup (scraping library) and html.parser
@@ -140,8 +141,20 @@ class RetrieveIndexThread(threading.Thread):
     
     #Download SERVICE CONSOLE integration toolkit doc entries
     def __get_serviceconsole_doc(self):
-        #Work in progress
-        pass
+        sf_html = urllib.request.urlopen(urllib.request.Request(SALESFORCE_SERVICECONSOLE_DOC_URL_BASE,None,{"User-Agent": "Mozilla/5.0"})).read().decode("utf-8")
+        page_soup = BeautifulSoup(sf_html, "html.parser")
+        reference_soup = page_soup.find_all("span", string=re.compile("Methods for \w"), class_="toc-text")
+        for reference in reference_soup:
+            span_list = reference.parent.parent.parent.find_all("span", class_="toc-text", string=re.compile("^(?!Methods for)"))
+            for span in span_list:
+                link = span.parent
+                reference_cache.append(
+                    SalesforceReferenceCacheEntry(
+                        span.string,
+                        link["href"],
+                        "ServiceConsole"
+                    )
+                )
 
     #Download VISUALFORCE doc entries
     def __get_visualforce_doc(self):        
@@ -186,3 +199,5 @@ class RetrieveIndexThread(threading.Thread):
                 webbrowser.open_new_tab(SALESFORCE_APEX_DOC_URL_BASE + reference_cache[reference_index].url)
             elif reference_cache[reference_index].docType == "Visualforce":
                 webbrowser.open_new_tab(SALESFORCE_VISUALFORCE_DOC_URL_BASE + reference_cache[reference_index].url)
+            elif reference_cache[reference_index].docType == "ServiceConsole"
+                webbrowser.open_new_tab(SALESFORCE_SERVICECONSOLE_DOC_URL_BASE + reference_cache[reference_index].url)
