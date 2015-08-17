@@ -23,5 +23,5 @@
     // serviceConsoleDoc:
     // Setting this to false means the plugin wont download Service Console
     // Javascript toolkit reference entries
-    serviceConsoleDoc: false
+    "serviceConsoleDoc": false
 }
