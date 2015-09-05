@@ -1,6 +1,18 @@
 [
   {
-    "caption": "Salesforce Reference",
-    "command": "salesforce_reference"
+    "caption": "Salesforce Apex Reference",
+    "command": "salesforce_apex_reference"
+  },
+  {
+    "caption": "Salesforce Visualforce Reference",
+    "command": "salesforce_visualforce_reference"
+  },
+  {
+    "caption": "Salesforce Service Console Reference",
+    "command": "salesforce_service_console_reference"
+  },
+  {
+    "caption": "Salesforce All Reference",
+    "command": "salesforce_all_reference"
   }
 ]
