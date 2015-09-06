@@ -236,7 +236,7 @@ class RetrieveIndexThread(threading.Thread):
         sf_html = urllib.request.urlopen(urllib.request.Request(SALESFORCE_VISUALFORCE_DOC_URL_BASE,None,{"User-Agent": "Mozilla/5.0"})).read().decode("utf-8")
         page_soup = BeautifulSoup(sf_html, "html.parser")
         reference_soup = page_soup.find_all(text="Standard Component Reference",class_="toc-text")[0].parent.parent.parent
-        span_list = reference_soup.find_all("span", class_="toc-text", text=re.compile("^(?!Standard Component Reference)"))
+        span_list = reference_soup.find_all("span", class_="toc-text")
         for span in span_list:
             link = span.parent
             reference_cache.append(
