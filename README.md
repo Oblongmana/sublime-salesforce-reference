@@ -59,12 +59,12 @@ Availables commands for key bindings are:
 
 To set a key binding to one of these go to Preferences > Key Bindings - User
 and insert something like this:
-    ```json
-    {
-        "keys": ["alt+s"],
-        "command": "salesforce_all_reference"
-    }
-    ```
+``` json
+{
+    "keys": ["alt+s"],
+    "command": "salesforce_all_reference"
+}
+```
 
 ## Contributing, Bugs, Suggestions, Questions
 
