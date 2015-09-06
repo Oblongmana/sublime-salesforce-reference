@@ -52,6 +52,7 @@ To edit your settings, go to Preferences > Package Settings > Salesforce Referen
 ## Key bindings
 
 Availables commands for key bindings are:
+
     * salesforce_apex_reference
     * salesforce_visualforce_reference
     * salesforce_service_console_reference
