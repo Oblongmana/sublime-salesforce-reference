@@ -5,7 +5,7 @@ __copyright__ = "SublimeSalesforceReference: (C) 2014-2015 James Hill. GNU GPL 3
 __credits__ = ["All Salesforce Documentation is © Copyright 2000–2015 salesforce.com, inc.", "ThreadProgress.py is under the MIT License, Will Bond <will@wbond.net>, and SalesforceReference.py's RetrieveIndexThread method is a derives in part from code under the same license"]
 
 import sublime, sublime_plugin
-import urllib
+import urllib.request
 import xml.etree.ElementTree as ElementTree
 import webbrowser
 import threading
@@ -50,7 +50,7 @@ class SalesforceReferenceCache(collections.MutableSequence):
         self.__sort_by_title()
         self.__determine_titles()
     
-    # Properties to display entries title in quick panel
+    # Properties to display entry's titles in quick panel
     @property
     def titles(self):
         return self.__titles
@@ -130,31 +130,35 @@ def plugin_loaded():
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Reference Index...", "")
 
-
+# Command to retrieve Apex reference
 class SalesforceApexReferenceCommand(sublime_plugin.WindowCommand):
     def run(self):
         thread = RetrieveIndexThread(self.window, APEX)        
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Apex Reference Index...", "")
 
+# Command to retrieve Visualforce reference
 class SalesforceVisualforceReferenceCommand(sublime_plugin.WindowCommand):
     def run(self):
         thread = RetrieveIndexThread(self.window, VISUALFORCE)        
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Visualforce Reference Index...", "")
 
+# Command to retrieve Service Console reference
 class SalesforceServiceConsoleReferenceCommand(sublime_plugin.WindowCommand):
     def run(self):
         thread = RetrieveIndexThread(self.window, SERVICECONSOLE)        
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Service Console Reference Index...", "")
 
+# Command to retrieve all references specified in settings file
 class SalesforceAllReferenceCommand(sublime_plugin.WindowCommand):
     def run(self):
         thread = RetrieveIndexThread(self.window, "all")
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Reference Index...", "")
 
+# Thread that actually download specified reference
 class RetrieveIndexThread(threading.Thread):
     """
     A thread to run retrieval of the Saleforce Documentation index, or access the reference_cache
@@ -213,9 +217,10 @@ class RetrieveIndexThread(threading.Thread):
     def __get_serviceconsole_doc(self):
         sf_html = urllib.request.urlopen(urllib.request.Request(SALESFORCE_SERVICECONSOLE_DOC_URL_BASE,None,{"User-Agent": "Mozilla/5.0"})).read().decode("utf-8")
         page_soup = BeautifulSoup(sf_html, "html.parser")
-        reference_soup = page_soup.find_all("span", string=re.compile("Methods for \w"), class_="toc-text")
+        reference_soup = page_soup.find_all("span", text=re.compile("Methods for \w"), class_="toc-text")
         for reference in reference_soup:
-            span_list = reference.parent.parent.parent.find_all("span", class_="toc-text", string=re.compile("^(?!Methods for)"))
+            span_list = reference.parent.parent.parent.find_all("span", class_="toc-text", text=re.compile("^(?!Methods for)"))
+            print("span list is:", span_list)
             for span in span_list:
                 link = span.parent
                 reference_cache.append(
@@ -231,7 +236,7 @@ class RetrieveIndexThread(threading.Thread):
         sf_html = urllib.request.urlopen(urllib.request.Request(SALESFORCE_VISUALFORCE_DOC_URL_BASE,None,{"User-Agent": "Mozilla/5.0"})).read().decode("utf-8")
         page_soup = BeautifulSoup(sf_html, "html.parser")
         reference_soup = page_soup.find_all(text="Standard Component Reference",class_="toc-text")[0].parent.parent.parent
-        span_list = reference_soup.find_all("span", class_="toc-text")
+        span_list = reference_soup.find_all("span", class_="toc-text", text=re.compile("^(?!Standard Component Reference)"))
         for span in span_list:
             link = span.parent
             reference_cache.append(
