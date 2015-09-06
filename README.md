@@ -48,18 +48,23 @@ To edit your settings, go to Preferences > Package Settings > Salesforce Referen
     serviceConsoleDoc: true
 }
 ```
+
+## Key bindings
+
 Availables commands for key bindings are:
-    - salesforce_apex_reference
-    - salesforce_visualforce_reference
-    - salesforce_service_console_reference
-    - salesforce_all_reference
+    1. salesforce_apex_reference
+    2. salesforce_visualforce_reference
+    3. salesforce_service_console_reference
+    4. salesforce_all_reference
 
 To set a key binding to one of these go to Preferences > Key Bindings - User
 and insert something like this:
+    ```json
     {
         "keys": ["alt+s"],
         "command": "salesforce_all_reference"
     }
+    ```
 
 ## Contributing, Bugs, Suggestions, Questions
 
