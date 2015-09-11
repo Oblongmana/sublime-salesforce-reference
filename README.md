@@ -21,31 +21,35 @@ To edit your settings, go to Preferences > Package Settings > Salesforce Referen
 
 ``` json
 {
-    //  refreshCacheOnLoad:
-    //
-    //  Setting this to false means the plugin will need to do a callout
-    //      to retrieve the Salesforce Reference Index from Salesforce
-    //      when the *Salesforce Reference* command is first run.
-    //
-    //      When set to true (RECOMMENDED, and the default setting), the
-    //      plugin will cache the Reference Index when Sublime Text starts
-    //      or the plugin is reloaded
+    /*  refreshCacheOnLoad:
+    *
+    *  Setting this to false means the plugin will need to do a callout
+    *      to retrieve the Salesforce Reference Index from Salesforce
+    *     when the *Salesforce Reference* command is first run.
+    *
+    *      When set to true (RECOMMENDED, and the default setting), the
+    *      plugin will cache the Reference Index when Sublime Text starts
+    *      or the plugin is reloaded
+    */
     "refreshCacheOnLoad": true,
     
-    // apexDoc:
-    // Setting this to false means the plugin wont download Apex
-    // reference entries
+    /* apexDoc:
+    * Setting this to false means the plugin wont download Apex
+    * reference entries
+    */
     "apexDoc": true,
     
-    // visualforceDoc:
-    // Setting this to false means the plugin wont download Visualforce
-    // reference entries
+    /* visualforceDoc:
+    * Setting this to false means the plugin wont download Visualforce
+    * reference entries
+    */
     "visualforceDoc": true,
     
-    // serviceConsoleDoc:
-    // Setting this to false means the plugin wont download Service Console
-    // Javascript toolkit reference entries
-    serviceConsoleDoc: true
+    /* serviceConsoleDoc:
+    * Setting this to false means the plugin wont download Service Console
+    * Javascript toolkit reference entries
+    */
+    "serviceConsoleDoc": true
 }
 ```
 
