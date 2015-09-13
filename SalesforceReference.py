@@ -49,7 +49,7 @@ class SalesforceReferenceCache(collections.MutableSequence):
         self.entries = list(data)
         self.__sort_by_title()
         self.__determine_titles()
-    
+
     # Properties to display entry's titles in quick panel
     @property
     def titles(self):
@@ -63,7 +63,7 @@ class SalesforceReferenceCache(collections.MutableSequence):
     @property
     def serviceconsoleTitles(self):
         return list(map(lambda entry: entry.title, self.__filter_entries(SERVICECONSOLE)))
-    
+
     # Properties to return a list of filtered entries
     @property
     def apexEntries(self):
@@ -74,7 +74,7 @@ class SalesforceReferenceCache(collections.MutableSequence):
     @property
     def serviceconsoleEntries(self):
         return self.__filter_entries(SERVICECONSOLE)
-    
+
     def __getitem__(self, key):
         return self.entries[key]
     def __setitem__(self, key, value):
@@ -220,7 +220,6 @@ class RetrieveIndexThread(threading.Thread):
         reference_soup = page_soup.find_all("span", text=re.compile("Methods for \w"), class_="toc-text")
         for reference in reference_soup:
             span_list = reference.parent.parent.parent.find_all("span", class_="toc-text", text=re.compile("^(?!Methods for)"))
-            print("span list is:", span_list)
             for span in span_list:
                 link = span.parent
                 reference_cache.append(
