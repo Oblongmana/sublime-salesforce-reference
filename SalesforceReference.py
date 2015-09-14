@@ -6,7 +6,6 @@ __credits__ = ["All Salesforce Documentation is © Copyright 2000–2015 salesfo
 
 import sublime, sublime_plugin
 import urllib.request
-import xml.etree.ElementTree as ElementTree
 import webbrowser
 import threading
 import re
