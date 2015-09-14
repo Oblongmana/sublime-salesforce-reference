@@ -9,8 +9,8 @@ import urllib.request
 import xml.etree.ElementTree as ElementTree
 import webbrowser
 import threading
-import collections
 import re
+from .salesforce_reference.cache import SalesforceReferenceCache,SalesforceReferenceCacheEntry
 from .ThreadProgress import ThreadProgress
 
 # Import BeautifulSoup (scraping library) and html.parser
@@ -39,84 +39,6 @@ SALESFORCE_SERVICECONSOLE_DOC_URL_BASE = "http://developer.salesforce.com/docs/a
 VISUALFORCE = "visualforce"
 APEX = "apex"
 SERVICECONSOLE = "serviceconsole"
-
-class SalesforceReferenceCache(collections.MutableSequence):
-    """
-    A cache of SalesforceReferenceEntry objects, sorted by Title. This order
-    will be maintained throughout append operations
-    """
-    def __init__(self, *data):
-        self.entries = list(data)
-        self.__sort_by_title()
-        self.__determine_titles()
-
-    # Properties to display entry's titles in quick panel
-    @property
-    def titles(self):
-        return self.__titles
-    @property
-    def apexTitles(self):
-        return list(map(lambda entry: entry.title, self.__filter_entries(APEX)))
-    @property
-    def visualforceTitles(self):
-        return list(map(lambda entry: entry.title, self.__filter_entries(VISUALFORCE)))
-    @property
-    def serviceconsoleTitles(self):
-        return list(map(lambda entry: entry.title, self.__filter_entries(SERVICECONSOLE)))
-
-    # Properties to return a list of filtered entries
-    @property
-    def apexEntries(self):
-        return self.__filter_entries(APEX)
-    @property
-    def visualforceEntries(self):
-        return self.__filter_entries(VISUALFORCE)
-    @property
-    def serviceconsoleEntries(self):
-        return self.__filter_entries(SERVICECONSOLE)
-
-    def __getitem__(self, key):
-        return self.entries[key]
-    def __setitem__(self, key, value):
-        self.entries[key] = value
-        self.__sort_by_title()
-        self.__determine_titles()
-    def __delitem__(self, key):
-        del self.entries[key]
-        self.__determine_titles()
-    def __len__(self):
-        return len(self.entries)
-    def __sort_by_title(self):
-        self.entries.sort(key=lambda cacheEntry: cacheEntry.title)
-    def insert(self, key,val):
-        self.entries.insert(key,val)
-        self.__sort_by_title()
-        self.__determine_titles()
-    def __determine_titles(self):
-        self.__titles = list(map(lambda entry: entry.title,self.entries))
-    #Return a list of entries filtered by doc_type and ordered by title
-    def __filter_entries(self, doc_type):
-        entries = [entry for entry in self.entries if entry.doc_type == doc_type]
-        entries.sort(key=lambda cacheEntry: cacheEntry.title)
-        return entries
-
-    """str and repr implemented for debugging"""
-    def __str__(self):
-        return str(self.entries)
-    def __repr__(self):
-        return repr(self.entries)
-
-class SalesforceReferenceCacheEntry(object):
-    def __init__(self,title,url,doc_type):
-        self.title = title
-        self.url = url
-        # Specify entry's type. Based on this value, change the doc base url
-        self.doc_type = doc_type
-    """str and repr implemented for debugging"""
-    def __str__(self):
-        return str({"title":self.title,"url":self.url,"doc_type":self.doc_type})
-    def __repr__(self):
-        return str({"title":self.title,"url":self.url,"doc_type":self.doc_type})
 
 #Store all reference entries
 reference_cache = SalesforceReferenceCache()
@@ -189,17 +111,19 @@ class RetrieveIndexThread(threading.Thread):
     def run(self):
         #Check if has to get APEX doc entries
         if self.doc_type == APEX or (self.doc_type == "all" and settings.get("apexDoc") == True):
-            if not reference_cache.apexEntries:
+            if not reference_cache.entries_by_doc_type.get(APEX):
                 self.__get_apex_doc()
 
         #Check if has to get Visualforce doc entries
+        print((self.doc_type == "all" and settings.get("visualforceDoc") == True))
         if self.doc_type == VISUALFORCE or (self.doc_type == "all" and settings.get("visualforceDoc") == True):
-            if not reference_cache.visualforceEntries:
+            print(str(reference_cache.entries_by_doc_type))
+            if not reference_cache.entries_by_doc_type.get(VISUALFORCE):
                 self.__get_visualforce_doc()
 
         #Check if has to get Service Console doc entries
         if self.doc_type == SERVICECONSOLE or (self.doc_type == "all" and settings.get("serviceConsoleDoc") == True):
-            if not reference_cache.serviceconsoleEntries:
+            if not reference_cache.entries_by_doc_type.get(SERVICECONSOLE):
                 self.__get_serviceconsole_doc();
 
         if(self.open_when_done):
@@ -207,11 +131,11 @@ class RetrieveIndexThread(threading.Thread):
             if (self.doc_type == "all"):
                 self.window.show_quick_panel(reference_cache.titles, self.open_documentation)
             elif (self.doc_type == APEX):
-                self.window.show_quick_panel(reference_cache.apexTitles, self.open_documentation)
+                self.window.show_quick_panel(reference_cache.titles_by_doc_type.get(APEX), self.open_documentation)
             elif (self.doc_type == VISUALFORCE):
-                self.window.show_quick_panel(reference_cache.visualforceTitles, self.open_documentation)
+                self.window.show_quick_panel(reference_cache.titles_by_doc_type.get(VISUALFORCE), self.open_documentation)
             elif (self.doc_type == SERVICECONSOLE):
-                self.window.show_quick_panel(reference_cache.serviceconsoleTitles, self.open_documentation)
+                self.window.show_quick_panel(reference_cache.titles_by_doc_type.get(SERVICECONSOLE), self.open_documentation)
 
     #Download SERVICE CONSOLE integration toolkit doc entries
     def __get_serviceconsole_doc(self):
