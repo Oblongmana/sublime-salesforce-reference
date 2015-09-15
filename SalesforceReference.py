@@ -5,36 +5,17 @@ __copyright__ = "SublimeSalesforceReference: (C) 2014-2015 James Hill. GNU GPL 3
 __credits__ = ["All Salesforce Documentation is © Copyright 2000–2015 salesforce.com, inc.", "ThreadProgress.py is under the MIT License, Will Bond <will@wbond.net>, and SalesforceReference.py's RetrieveIndexThread method is a derives in part from code under the same license"]
 
 import sublime, sublime_plugin
-import urllib.request
 import webbrowser
 import threading
 from queue import Queue
-import re
 # TODO: See if possible to rename the plugin while playing nice with Package
 #       Control. The current name is "sublime-salesforce-reference" - which
 #       means we can't do (for example)
 #       `import sublime-salesforce-reference.salesforce_reference.cache`
 #       as the dashes are interpreted as minuses
-from .salesforce_reference.cache import SalesforceReferenceCache,SalesforceReferenceCacheEntry
+from .salesforce_reference.cache import SalesforceReferenceCache
 from .salesforce_reference.retrieve import DocTypeEnum, DocType
 from .ThreadProgress import ThreadProgress
-
-# Import BeautifulSoup (scraping library) and html.parser
-#  - Necessary, because as at 2015-06-02 Salesforce no longer uses an XML file
-#    for generating Table of Contents, so we have to scrape a ToC out of the
-#    page itself
-#  - NB: attempting to use html5lib was horrible, due to dependence on six,
-#    which obstinately refused to work.
-#  - Built in html.parser seems perfectly adequate to needs, but if we ever
-#    support ST2, we should check for ST2 and use HTMLParser (if BeautifulSoup
-#    supports)
-#  - NB: bs4 was rebuilt (using 2to3) for Python3; we'd need to include a
-#    Python2 build if we ever support ST2
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), os.path.normpath("lib")))
-from bs4 import BeautifulSoup
-import html.parser
 
 
 #Global reference cache for holding all documentation entries
