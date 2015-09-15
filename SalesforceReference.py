@@ -20,6 +20,7 @@ from .ThreadProgress import ThreadProgress
 
 #Global reference cache for holding all documentation entries
 reference_cache = SalesforceReferenceCache()
+cache_lock = threading.Lock()
 
 
 def plugin_loaded():
@@ -110,8 +111,6 @@ class RetrieveIndexThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        cache_lock = threading.Lock()
-
         if self.doc_type == "*":
             for doc_type in DocTypeEnum.get_all():
                 doc_type_settings = settings.get("docTypes").get(doc_type.name.lower())
