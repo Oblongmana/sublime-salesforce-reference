@@ -115,6 +115,8 @@ class RetrieveIndexThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
+        cache_lock = threading.Lock()
+
         if self.doc_type == "*":
             doc_type_settings = settings.get("docTypes")
             for doc_type in DocTypeEnum.get_all():
@@ -122,10 +124,10 @@ class RetrieveIndexThread(threading.Thread):
                         not doc_type_settings.get(doc_type.name.lower()).get('excludeFromAllDocumentationCommand')
                         and not reference_cache.entries_by_doc_type.get(doc_type.name)
                     ):
-                    self.queue.put(doc_type.preferred_strategy(self.window,reference_cache,self.queue.task_done))
+                    self.queue.put(doc_type.preferred_strategy(self.window,reference_cache,cache_lock,self.queue.task_done))
         else:
             if not reference_cache.entries_by_doc_type.get(self.doc_type.name):
-                self.queue.put(self.doc_type.preferred_strategy(self.window,reference_cache,self.queue.task_done))
+                self.queue.put(self.doc_type.preferred_strategy(self.window,reference_cache,cache_lock,self.queue.task_done))
 
         while not self.queue.empty():
             self.queue.get().start()

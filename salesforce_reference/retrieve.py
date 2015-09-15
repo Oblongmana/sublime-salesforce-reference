@@ -20,7 +20,7 @@ from bs4 import BeautifulSoup
 import html.parser
 
 class DocRetrievalStrategy(threading.Thread):
-    def __init__(self, window, cache, done_callback):
+    def __init__(self, window, cache, cache_lock, done_callback):
         """
         :param window:
             An instance of :class:`sublime.Window` that represents the Sublime
@@ -33,6 +33,7 @@ class DocRetrievalStrategy(threading.Thread):
         """
         self.window = window
         self.cache = cache
+        self.cache_lock = cache_lock
         self.done_callback = done_callback
         threading.Thread.__init__(self)
 
@@ -53,8 +54,8 @@ class DocRetrievalStrategy(threading.Thread):
 
 
 class ApexDocScrapingStrategy(DocRetrievalStrategy):
-    def __init__(self, window, cache, done_callback):
-        DocRetrievalStrategy.__init__(self, window, cache, done_callback)
+    def __init__(self, window, cache, cache_lock, done_callback):
+        DocRetrievalStrategy.__init__(self, window, cache, cache_lock, done_callback)
 
     @property
     def doc_type(self):
@@ -71,18 +72,19 @@ class ApexDocScrapingStrategy(DocRetrievalStrategy):
             if header_soup not in unique_header_soup_list:
                 unique_header_soup_list.append(header_soup)
                 header_data_tag = header_soup.find(class_="toc-a-block")
-                self.cache.append(
-                    SalesforceReferenceCacheEntry(
-                        header_data_tag.find(class_="toc-text").string,
-                        header_data_tag["href"],
-                        DocTypeEnum.APEX.name
+                with self.cache_lock:
+                    self.cache.append(
+                        SalesforceReferenceCacheEntry(
+                            header_data_tag.find(class_="toc-text").string,
+                            header_data_tag["href"],
+                            DocTypeEnum.APEX.name
+                        )
                     )
-                )
         self.done_callback()
 
 class VisualforceDocScrapingStrategy(DocRetrievalStrategy):
-    def __init__(self, window, cache, done_callback):
-        DocRetrievalStrategy.__init__(self, window, cache, done_callback)
+    def __init__(self, window, cache, cache_lock, done_callback):
+        DocRetrievalStrategy.__init__(self, window, cache, cache_lock, done_callback)
 
     @property
     def doc_type(self):
@@ -95,18 +97,19 @@ class VisualforceDocScrapingStrategy(DocRetrievalStrategy):
         span_list = reference_soup.find_all("span", class_="toc-text")
         for span in span_list:
             link = span.parent
-            self.cache.append(
-                    SalesforceReferenceCacheEntry(
-                        span.string,
-                        link["href"],
-                        DocTypeEnum.VISUALFORCE.name
+            with self.cache_lock:
+                self.cache.append(
+                        SalesforceReferenceCacheEntry(
+                            span.string,
+                            link["href"],
+                            DocTypeEnum.VISUALFORCE.name
+                        )
                     )
-                )
         self.done_callback()
 
 class ServiceConsoleDocScrapingStrategy(DocRetrievalStrategy):
-    def __init__(self, window, cache, done_callback):
-        DocRetrievalStrategy.__init__(self, window, cache, done_callback)
+    def __init__(self, window, cache, cache_lock, done_callback):
+        DocRetrievalStrategy.__init__(self, window, cache, cache_lock, done_callback)
 
     @property
     def doc_type(self):
@@ -120,13 +123,14 @@ class ServiceConsoleDocScrapingStrategy(DocRetrievalStrategy):
             span_list = reference.parent.parent.parent.find_all("span", class_="toc-text", text=re.compile("^(?!Methods for)"))
             for span in span_list:
                 link = span.parent
-                self.cache.append(
-                    SalesforceReferenceCacheEntry(
-                        span.string,
-                        link["href"],
-                        DocTypeEnum.SERVICECONSOLE.name
+                with self.cache_lock:
+                    self.cache.append(
+                        SalesforceReferenceCacheEntry(
+                            span.string,
+                            link["href"],
+                            DocTypeEnum.SERVICECONSOLE.name
+                        )
                     )
-                )
         self.done_callback()
 
 class DocType:
