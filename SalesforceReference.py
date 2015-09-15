@@ -37,11 +37,12 @@ from bs4 import BeautifulSoup
 import html.parser
 
 
-#Store all reference entries
+#Global reference cache for holding all documentation entries
 reference_cache = SalesforceReferenceCache()
 
+
 def plugin_loaded():
-    # Get settings
+    # Add settings to global, and pre-cache documentation if/as appropriate
     global settings
     settings = sublime.load_settings("SublimeSalesforceReference.sublime-settings")
     if settings != None and settings.get("refreshCacheOnLoad") == True:
@@ -70,17 +71,17 @@ class SalesforceReferenceServiceConsoleCommand(sublime_plugin.WindowCommand):
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Service Console Reference Index...", "")
 
-# Command to retrieve all references specified in settings file
+# Command to retrieve all documentation (except for any specifically excluded by user in settings)
 class SalesforceReferenceAllDocumentationTypesCommand(sublime_plugin.WindowCommand):
     def run(self):
         thread = RetrieveIndexThread(self.window, "*")
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Reference Index...", "")
 
-# Thread that actually download specified reference
+
 class RetrieveIndexThread(threading.Thread):
     """
-    A thread to run retrieval of the Saleforce Documentation index, or access the reference_cache
+    A thread to run retrieval of the Saleforce Documentation index, and access the reference_cache
     """
 
     def __init__(self, window, doc_type, open_when_done=True, sublime_opening_cache_refresh=False):

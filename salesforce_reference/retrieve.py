@@ -27,6 +27,8 @@ class DocRetrievalStrategy(threading.Thread):
             Text window to show the available package list in.
         :cache
             an instance of SalesforceReferenceCache
+        :cache_lock
+            a threading.Lock to be used when modifying the cache
         :done_callback
             a function to call when the thread is done running. This would
             generally be something like a `Queue` instance's `task_done` method
@@ -42,7 +44,8 @@ class DocRetrievalStrategy(threading.Thread):
         raise NotImplementedError(
                 "SalesforceDocRetrievalStrategy is an interface, implementing "
                 "classes should override `doc_type` to return an appropriate "
-                " string indicating the doc type (e.g. 'VISUALFORCE') "
+                "string indicating the doc type (e.g. "
+                "DocTypeEnum.VISUALFORCE.name) "
             )
 
     def run(self):

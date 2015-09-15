@@ -77,7 +77,6 @@ class SalesforceReferenceCacheEntry(object):
     def __init__(self,title,url,doc_type):
         self.title = title
         self.url = url
-        # Specify entry's type. Based on this value, change the doc base url
         self.doc_type = doc_type
     """required functions for use with sort() and sorted()"""
     """the total_ordering annotation supplies remaining comparison functions"""
