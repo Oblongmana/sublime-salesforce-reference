@@ -1,145 +1,155 @@
 """SublimeSalesforceReference: Quick access to Salesforce Documentation from Sublime Text"""
-__version__ = "1.4.0"
-__author__ = "James Hill (oblongmana@gmail.com)"
+__version__ = "2.0.0"
+__author__ = "James Hill <me@jameshill.io>"
 __copyright__ = "SublimeSalesforceReference: (C) 2014-2015 James Hill. GNU GPL 3."
 __credits__ = ["All Salesforce Documentation is © Copyright 2000–2015 salesforce.com, inc.", "ThreadProgress.py is under the MIT License, Will Bond <will@wbond.net>, and SalesforceReference.py's RetrieveIndexThread method is a derives in part from code under the same license"]
 
 import sublime, sublime_plugin
-import urllib
-import xml.etree.ElementTree as ElementTree
 import webbrowser
 import threading
-import collections
+from queue import Queue
+# TODO: See if possible to rename the plugin while playing nice with Package
+#       Control. The current name is "sublime-salesforce-reference" - which
+#       means we can't do (for example)
+#       `import sublime-salesforce-reference.salesforce_reference.cache`
+#       as the dashes are interpreted as minuses
+from .salesforce_reference.cache import SalesforceReferenceCache
+from .salesforce_reference.retrieve import DocTypeEnum, DocType
 from .ThreadProgress import ThreadProgress
 
-# Import BeautifulSoup (scraping library) and html.parser
-#  - Necessary, because as at 2015-06-02 Salesforce no longer uses an XML file
-#    for generating Table of Contents, so we have to scrape a ToC out of the
-#    page itself
-#  - NB: attempting to use html5lib was horrible, due to dependence on six,
-#    which obstinately refused to work.
-#  - Built in html.parser seems perfectly adequate to needs, but if we ever
-#    support ST2, we should check for ST2 and use HTMLParser (if BeautifulSoup
-#    supports)
-#  - NB: bs4 was rebuilt (using 2to3) for Python3; we'd need to include a
-#    Python2 build if we ever support ST2
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), os.path.normpath("lib")))
-from bs4 import BeautifulSoup
-import html.parser
 
-SALESFORCE_DOC_URL_BASE = 'http://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/'
-
-class SalesforceReferenceCache(collections.MutableSequence):
-    """
-    A cache of SalesforceReferenceEntry objects, sorted by Title. This order
-    will be maintained throughout append operations
-    """
-    def __init__(self, *data):
-        self.entries = list(data)
-        self.__sort_by_title()
-        self.__determine_titles()
-    @property
-    def titles(self):
-        return self.__titles
-    def __getitem__(self, key):
-        return self.entries[key]
-    def __setitem__(self, key, value):
-        self.entries[key] = value
-        self.__sort_by_title()
-        self.__determine_titles()
-    def __delitem__(self, key):
-        del self.entries[key]
-        self.__determine_titles()
-    def __len__(self):
-        return len(self.entries)
-    def __sort_by_title(self):
-        self.entries.sort(key=lambda cacheEntry: cacheEntry.title)
-    def insert(self, key,val):
-        self.entries.insert(key,val)
-        self.__sort_by_title()
-        self.__determine_titles()
-    def __determine_titles(self):
-        self.__titles = list(map(lambda entry: entry.title,self.entries))
-    """str and repr implemented for debugging"""
-    def __str__(self):
-        return str(self.entries)
-    def __repr__(self):
-        return repr(self.entries)
-
-class SalesforceReferenceCacheEntry(object):
-    def __init__(self,title,url):
-        self.title = title
-        self.url = url
-    """str and repr implemented for debugging"""
-    def __str__(self):
-        return str({'title':self.title,'url':self.url})
-    def __repr__(self):
-        return str({'title':self.title,'url':self.url})
-
-
-
+#Global reference cache for holding all documentation entries
 reference_cache = SalesforceReferenceCache()
+cache_lock = threading.Lock()
 
 
 def plugin_loaded():
+    # Add settings to global, and pre-cache documentation if/as appropriate
+    global settings
     settings = sublime.load_settings("SublimeSalesforceReference.sublime-settings")
     if settings != None and settings.get("refreshCacheOnLoad") == True:
-        thread = RetrieveIndexThread(sublime.active_window(),False)
+        thread = RetrieveIndexThread(sublime.active_window(), "*", open_when_done=False,sublime_opening_cache_refresh=True)
         thread.start()
-        ThreadProgress(thread, 'Retrieving Salesforce Reference Index...', '')
+        ThreadProgress(thread, "Retrieving Salesforce Reference Index...", "")
 
-
-class SalesforceReferenceCommand(sublime_plugin.WindowCommand):
+# Command to retrieve Apex reference
+class SalesforceReferenceApexCommand(sublime_plugin.WindowCommand):
     def run(self):
-        thread = RetrieveIndexThread(self.window)
+        thread = RetrieveIndexThread(self.window, DocTypeEnum.APEX)
         thread.start()
-        ThreadProgress(thread, 'Retrieving Salesforce Reference Index...', '')
+        ThreadProgress(thread, "Retrieving Salesforce Apex Reference Index...", "")
+
+# Command to retrieve Visualforce reference
+class SalesforceReferenceVisualforceCommand(sublime_plugin.WindowCommand):
+    def run(self):
+        thread = RetrieveIndexThread(self.window, DocTypeEnum.VISUALFORCE)
+        thread.start()
+        ThreadProgress(thread, "Retrieving Salesforce Visualforce Reference Index...", "")
+
+# Command to retrieve Service Console reference
+class SalesforceReferenceServiceConsoleCommand(sublime_plugin.WindowCommand):
+    def run(self):
+        thread = RetrieveIndexThread(self.window, DocTypeEnum.SERVICECONSOLE)
+        thread.start()
+        ThreadProgress(thread, "Retrieving Salesforce Service Console Reference Index...", "")
+
+# Command to retrieve all documentation (except for any specifically excluded by user in settings)
+class SalesforceReferenceAllDocumentationTypesCommand(sublime_plugin.WindowCommand):
+    def run(self):
+        thread = RetrieveIndexThread(self.window, "*")
+        thread.start()
+        ThreadProgress(thread, "Retrieving Salesforce Reference Index...", "")
 
 
 class RetrieveIndexThread(threading.Thread):
     """
-    A thread to run retrieval of the Saleforce Documentation index, or access the reference_cache
+    A thread to run retrieval of the Saleforce Documentation index, and access the reference_cache
     """
 
-    def __init__(self, window, open_when_done=True):
+    def __init__(self, window, doc_type, open_when_done=True, sublime_opening_cache_refresh=False):
         """
         :param window:
             An instance of :class:`sublime.Window` that represents the Sublime
             Text window to show the available package list in.
+        :param doc_type:
+            Either:
+             - a salesforce_reference.retrieve.DocType (usually obtained from
+                salesforce_reference.retrieve.DocTypeEnum) indicating the
+                docType to retrieve
+             - the string "*" - indicating that all documentation types should
+                be retrieved and displayed at the same time
         :param open_when_done:
             Whether this thread is being run solely for caching, or should open
             the documentation list for user selection when done. Defaults to
             true - should open the documentaton list when done
+        :param sublime_opening_cache_refresh:
+            flag indicating whether this is a cache refresh happening while
+            sublime is opening. Setting this to True causes special behaviour:
+             - open_when_done param will be set to False as this is not a user
+                initiated action, so opening the doc searcher would be jarring
+             - doc_type will be ignored - we will cache all the doc types we can,
+                however...
+             - if refreshCacheOnLoad is set to False in the settings for a
+                particular doc type, this doc type will not be cached
         """
         self.window = window
+        if not isinstance(doc_type,DocType) and doc_type != "*":
+            raise ValueError(
+                    "doc_type parameter to RetrieveIndexThread must be either "
+                    "an instance of DocType (or a subclass), or the string '*' "
+                    "indicating you want to retrieve and display all available "
+                    "documentation types "
+                )
+        self.doc_type = doc_type
         self.open_when_done = open_when_done
+        self.sublime_opening_cache_refresh = sublime_opening_cache_refresh
+        if sublime_opening_cache_refresh:
+            self.doc_type = "*"
+            self.open_when_done = False
+        self.queue = Queue()
         global reference_cache
         threading.Thread.__init__(self)
 
     def run(self):
-        if not (reference_cache.entries):
-            sf_html = urllib.request.urlopen(urllib.request.Request(SALESFORCE_DOC_URL_BASE,None,{'User-Agent': 'Mozilla/5.0'})).read().decode('utf-8')
-            page_soup = BeautifulSoup(sf_html, 'html.parser')
-            reference_soup = page_soup.find_all(text='Reference',class_='toc-text')[0].parent.parent.next_sibling
-            leaf_soup_list = reference_soup.find_all(class_='leaf')
-            header_soup_list = map(lambda leaf: leaf.parent.previous_sibling,leaf_soup_list)
-            unique_header_soup_list = list()
-            for header_soup in header_soup_list:
-                if header_soup not in unique_header_soup_list:
-                    unique_header_soup_list.append(header_soup)
-                    header_data_tag = header_soup.find(class_='toc-a-block')
-                    reference_cache.append(
-                        SalesforceReferenceCacheEntry(
-                            header_data_tag.find(class_='toc-text').string,
-                            header_data_tag['href']
-                        )
-                    )
+        if self.doc_type == "*":
+            for doc_type in DocTypeEnum.get_all():
+                doc_type_settings = settings.get("docTypes").get(doc_type.name.lower())
+                if  (
+                            not doc_type_settings.get("excludeFromAllDocumentationCommand")
+                        and not reference_cache.entries_by_doc_type.get(doc_type.name)
+                        and not (
+                                        self.sublime_opening_cache_refresh
+                                    and not doc_type_settings.get("refreshCacheOnLoad")
+                                )
+                    ):
+                    self.queue.put(doc_type.preferred_strategy(self.window,reference_cache,cache_lock,self.queue.task_done))
+        else:
+            if not reference_cache.entries_by_doc_type.get(self.doc_type.name):
+                self.queue.put(self.doc_type.preferred_strategy(self.window,reference_cache,cache_lock,self.queue.task_done))
+
+        while not self.queue.empty():
+            self.queue.get().start()
+
         if(self.open_when_done):
-            self.window.show_quick_panel(reference_cache.titles, self.open_documentation)
+            self.queue.join()
+            if self.doc_type == "*":
+                self.window.show_quick_panel(reference_cache.titles, self.open_documentation)
+            else:
+                self.window.show_quick_panel(reference_cache.titles_by_doc_type.get(self.doc_type.name), self.open_documentation)
 
     def open_documentation(self, reference_index):
+        url = ""
         if(reference_index != -1):
-            base_url= 'http://www.salesforce.com/us/developer/docs/apexcode'
-            webbrowser.open_new_tab(SALESFORCE_DOC_URL_BASE + reference_cache[reference_index].url)
+            if self.doc_type == "*":
+                entry = reference_cache.entries[reference_index]
+            else:
+                entry = reference_cache.entries_by_doc_type.get(self.doc_type.name)[reference_index]
+
+            if entry:
+                if self.doc_type == "*":
+                    url = DocTypeEnum.get_by_name(entry.doc_type).url + entry.url
+                else:
+                    url = self.doc_type.url + entry.url
+
+            if url:
+                webbrowser.open_new_tab(url)

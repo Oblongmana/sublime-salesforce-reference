@@ -1,6 +1,18 @@
 [
   {
-    "caption": "Salesforce Reference",
-    "command": "salesforce_reference"
+    "caption": "Salesforce Reference - Apex",
+    "command": "salesforce_reference_apex"
+  },
+  {
+    "caption": "Salesforce Reference - Visualforce",
+    "command": "salesforce_reference_visualforce"
+  },
+  {
+    "caption": "Salesforce Reference - Service Console",
+    "command": "salesforce_reference_service_console"
+  },
+  {
+    "caption": "Salesforce Reference - All Documentation Types",
+    "command": "salesforce_reference_all_documentation_types"
   }
 ]

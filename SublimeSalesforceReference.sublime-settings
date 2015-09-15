@@ -1,12 +1,51 @@
 {
-    //  refreshCacheOnLoad:
-    //
-    //  Setting this to false means the plugin will need to do a callout
-    //      to retrieve the Salesforce Reference Index from Salesforce
-    //      when the *Salesforce Reference* command is first run.
-    //
-    //      When set to true (RECOMMENDED, and the default setting), the
-    //      plugin will cache the Reference Index when Sublime Text starts
-    //      or the plugin is reloaded
-    "refreshCacheOnLoad": true 
+    /**
+     * refreshCacheOnLoad:
+     *
+     * Setting this to false means the plugin will need to do a callout
+     *     to retrieve the Salesforce Reference Index from Salesforce
+     *     when the *Salesforce Reference* command is first run.
+     *
+     *     When set to true (RECOMMENDED, and the default setting), the
+     *     plugin will cache the Reference Index when Sublime Text starts
+     *     or the plugin is reloaded. This happens asynchronously, and will not
+     *     prevent you from doing other work in Sublime
+     */
+    "refreshCacheOnLoad": true,
+
+    /**
+     *  docTypes:
+     *
+     *  Each docType has one option:
+     *   - refreshCacheOnLoad:
+     *       if the top-level refreshCacheOnLoad setting is true, and this
+     *       docType's refreshCacheOnLoad setting is true - this documentation
+     *       type will be cache when sublime starts up. Otherwise, this
+     *       documentation type will only be retrieved and cached when it's
+     *       corresponding command is run
+     *   - excludeFromAllDocumentationCommand:
+     *       if this is set to true, the command "Salesforce Reference - All
+     *       Documentation Types" will not include this documentation type.
+     *       If set to false for a documentation type, uou'll only be able to
+     *       view that documentation type with from the command specific to it,
+     *       it won't be included in the command "Salesforce Reference - All
+     *       Documentation Types"
+     *
+     *  Note to developers: the keys in `docTypes` should be an exact lowercase
+     *   match of one of the keys in salesforce_reference.retrieve.DocTypeEnum
+     */
+    "docTypes": {
+      "apex": {
+        "refreshCacheOnLoad": true,
+        "excludeFromAllDocumentationCommand": false
+      },
+      "visualforce": {
+        "refreshCacheOnLoad": true,
+        "excludeFromAllDocumentationCommand": false
+      },
+      "serviceconsole": {
+        "refreshCacheOnLoad": false,
+        "excludeFromAllDocumentationCommand": false
+      }
+    }
 }
