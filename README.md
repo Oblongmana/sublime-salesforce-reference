@@ -11,7 +11,7 @@ A plugin for Sublime Text that gives you quick access to Salesforce Documentatio
 
 SublimeSalesforceReference adds a new command to your palette: *'Salesforce Reference'*. Simply select this command, and the plugin will retrieve an index of reference pages from Salesforce and show them to you in a quick panel. Search for what you're after, press enter, and the documentation page will open in your web browser!
 
-![](http://oblongmana.com/images/doc/sublime-salesforce-reference/usage.png)
+![](http://jameshill.io/images/doc/sublime-salesforce-reference/usage.png)
 
 By default, the plugin will make a callout to cache the Salesforce Reference Index when Sublime Text opens, so that when you run the *Salesforce Reference* command, the list of reference pages will open instantly. You can disable the cache-on-load behaviour (see the Settings section for how to do so), in which case the cache will be filled the first time you run the command.
 
@@ -89,7 +89,7 @@ If you don't follow those instructions precisely, it's probably no big deal, we'
 ## License
 
 ### Sublime Salesforce Reference
-Copyright (c) 2014-2015 James Hill <oblongmana@gmail.com>
+Copyright (c) 2014-2015 James Hill <me@jameshill.io>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
