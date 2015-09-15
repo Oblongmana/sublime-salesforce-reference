@@ -58,12 +58,6 @@ class SalesforceReferenceCache(collections.MutableSequence):
     def __index_titles_by_doc_type(self):
         self.__titles_by_doc_type = {title_key: self.__extract_titles_from_list(sorted(list(entry)))
                                      for title_key, entry in self.__groupby(sorted(self.__entries),lambda entry: entry.doc_type)}
-    #Return a list of entries filtered by doc_type and ordered by title
-    # TODO: can probably remove this
-    def __filter_entries(self, doc_type):
-        entries = [entry for entry in self.__entries if entry.doc_type == doc_type]
-        entries.sort(key=lambda cacheEntry: cacheEntry.title)
-        return entries
     def __groupby(self, the_list, key=lambda x: x):
         # From http://stackoverflow.com/a/15250161/157556
         # itertools.groupby didn't play nice with custom sorting
