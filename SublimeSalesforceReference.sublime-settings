@@ -8,20 +8,39 @@
     //      When set to true (RECOMMENDED, and the default setting), the
     //      plugin will cache the Reference Index when Sublime Text starts
     //      or the plugin is reloaded
-    "refreshCacheOnLoad": true,
-    
-    // apexDoc:
-    // Setting this to false means the plugin wont download Apex
-    // reference entries
-    "apexDoc": true,
-    
-    // visualforceDoc:
-    // Setting this to false means the plugin wont download Visualforce
-    // reference entries
-    "visualforceDoc": false,
-    
-    // serviceConsoleDoc:
-    // Setting this to false means the plugin wont download Service Console
-    // Javascript toolkit reference entries
-    "serviceConsoleDoc": false
+    "refreshCacheOnLoad": false,
+
+    //  docTypes:
+    //
+    //  Each docType has one option:
+    //   - refreshCacheOnLoad:
+    //       if the top-level refreshCacheOnLoad setting is true, and this
+    //       docType's refreshCacheOnLoad setting is true - this documentation
+    //       type will be cache when sublime starts up. Otherwise, this
+    //       documentation type will only be retrieved and cached when it's
+    //       corresponding command is run
+    //   - excludeFromAllDocumentationCommand:
+    //       if this is set to true, the command "Salesforce Reference - All
+    //       Documentation Types" will not include this documentation type.
+    //       If set to false for a documentation type, uou'll only be able to
+    //       view that documentation type with from the command specific to it,
+    //       it won't be included in the command "Salesforce Reference - All
+    //       Documentation Types"
+    //
+    //  Note to developers: the keys in `docTypes` should be an exact lowercase
+    //   match of one of the keys in salesforce_reference.retrieve.DocTypeEnum
+    "docTypes": {
+      "apex": {
+        "refreshCacheOnLoad": true,
+        "excludeFromAllDocumentationCommand": false
+      },
+      "visualforce": {
+        "refreshCacheOnLoad": false,
+        "excludeFromAllDocumentationCommand": false
+      },
+      "serviceconsole": {
+        "refreshCacheOnLoad": false,
+        "excludeFromAllDocumentationCommand": false
+      }
+    }
 }

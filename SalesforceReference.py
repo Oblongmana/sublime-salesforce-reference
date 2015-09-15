@@ -8,8 +8,15 @@ import sublime, sublime_plugin
 import urllib.request
 import webbrowser
 import threading
+from queue import Queue
 import re
+# TODO: See if possible to rename the plugin while playing nice with Package
+#       Control. The current name is "sublime-salesforce-reference" - which
+#       means we can't do (for example)
+#       `import sublime-salesforce-reference.salesforce_reference.cache`
+#       as the dashes are interpreted as minuses
 from .salesforce_reference.cache import SalesforceReferenceCache,SalesforceReferenceCacheEntry
+from .salesforce_reference.retrieve import DocTypeEnum, DocType
 from .ThreadProgress import ThreadProgress
 
 # Import BeautifulSoup (scraping library) and html.parser
@@ -29,15 +36,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), os.path.normpath("lib"))
 from bs4 import BeautifulSoup
 import html.parser
 
-#These are Salesforce official documentation links
-SALESFORCE_APEX_DOC_URL_BASE = "http://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/"
-SALESFORCE_VISUALFORCE_DOC_URL_BASE = "http://developer.salesforce.com/docs/atlas.en-us.pages.meta/pages/"
-SALESFORCE_SERVICECONSOLE_DOC_URL_BASE = "http://developer.salesforce.com/docs/atlas.en-us.api_console.meta/api_console/"
-
-#These are available documentation type
-VISUALFORCE = "visualforce"
-APEX = "apex"
-SERVICECONSOLE = "serviceconsole"
 
 #Store all reference entries
 reference_cache = SalesforceReferenceCache()
@@ -47,35 +45,35 @@ def plugin_loaded():
     global settings
     settings = sublime.load_settings("SublimeSalesforceReference.sublime-settings")
     if settings != None and settings.get("refreshCacheOnLoad") == True:
-        thread = RetrieveIndexThread(sublime.active_window(), "all", False)
+        thread = RetrieveIndexThread(sublime.active_window(), "*", False)
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Reference Index...", "")
 
 # Command to retrieve Apex reference
-class SalesforceApexReferenceCommand(sublime_plugin.WindowCommand):
+class SalesforceReferenceApexCommand(sublime_plugin.WindowCommand):
     def run(self):
-        thread = RetrieveIndexThread(self.window, APEX)
+        thread = RetrieveIndexThread(self.window, DocTypeEnum.APEX)
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Apex Reference Index...", "")
 
 # Command to retrieve Visualforce reference
-class SalesforceVisualforceReferenceCommand(sublime_plugin.WindowCommand):
+class SalesforceReferenceVisualforceCommand(sublime_plugin.WindowCommand):
     def run(self):
-        thread = RetrieveIndexThread(self.window, VISUALFORCE)
+        thread = RetrieveIndexThread(self.window, DocTypeEnum.VISUALFORCE)
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Visualforce Reference Index...", "")
 
 # Command to retrieve Service Console reference
-class SalesforceServiceConsoleReferenceCommand(sublime_plugin.WindowCommand):
+class SalesforceReferenceServiceConsoleCommand(sublime_plugin.WindowCommand):
     def run(self):
-        thread = RetrieveIndexThread(self.window, SERVICECONSOLE)
+        thread = RetrieveIndexThread(self.window, DocTypeEnum.SERVICECONSOLE)
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Service Console Reference Index...", "")
 
 # Command to retrieve all references specified in settings file
-class SalesforceAllReferenceCommand(sublime_plugin.WindowCommand):
+class SalesforceReferenceAllDocumentationTypesCommand(sublime_plugin.WindowCommand):
     def run(self):
-        thread = RetrieveIndexThread(self.window, "all")
+        thread = RetrieveIndexThread(self.window, "*")
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Reference Index...", "")
 
@@ -91,123 +89,64 @@ class RetrieveIndexThread(threading.Thread):
             An instance of :class:`sublime.Window` that represents the Sublime
             Text window to show the available package list in.
         :param doc_type:
-            Specify what kind of documentation to retrieve. Accepted values are:
-                apex, retrive only apex reference entries
-                visualforce, retrieve only visualforce entries
-                serviceconsole, retrieve only service console entries
-                all, retrieve references specified in Settings file
+            Either:
+             - a salesforce_reference.retrieve.DocType (usually obtained from
+                salesforce_reference.retrieve.DocTypeEnum) indicating the
+                docType to retrieve
+             - the string "*" - indicating that all documentation types should
+                be retrieved and displayed at the same time
         :param open_when_done:
             Whether this thread is being run solely for caching, or should open
             the documentation list for user selection when done. Defaults to
             true - should open the documentaton list when done
         """
         self.window = window
+        if not isinstance(doc_type,DocType) and doc_type != "*":
+            raise ValueError(
+                    "doc_type parameter to RetrieveIndexThread must be either "
+                    "an instance of DocType (or a subclass), or the string '*' "
+                    "indicating you want to retrieve and display all available "
+                    "documentation types "
+                )
         self.doc_type = doc_type
         self.open_when_done = open_when_done
+        self.queue = Queue()
         global reference_cache
         threading.Thread.__init__(self)
 
     def run(self):
-        #Check if has to get APEX doc entries
-        if self.doc_type == APEX or (self.doc_type == "all" and settings.get("apexDoc") == True):
-            if not reference_cache.entries_by_doc_type.get(APEX):
-                self.__get_apex_doc()
+        if self.doc_type == "*":
+            doc_type_settings = settings.get("docTypes")
+            for doc_type in DocTypeEnum.get_all():
+                if (
+                        not doc_type_settings.get(doc_type.name.lower()).get('excludeFromAllDocumentationCommand')
+                        and not reference_cache.entries_by_doc_type.get(doc_type.name)
+                    ):
+                    self.queue.put(doc_type.preferred_strategy(self.window,reference_cache,self.queue.task_done))
+        else:
+            if not reference_cache.entries_by_doc_type.get(self.doc_type.name):
+                self.queue.put(self.doc_type.preferred_strategy(self.window,reference_cache,self.queue.task_done))
 
-        #Check if has to get Visualforce doc entries
-        print((self.doc_type == "all" and settings.get("visualforceDoc") == True))
-        if self.doc_type == VISUALFORCE or (self.doc_type == "all" and settings.get("visualforceDoc") == True):
-            print(str(reference_cache.entries_by_doc_type))
-            if not reference_cache.entries_by_doc_type.get(VISUALFORCE):
-                self.__get_visualforce_doc()
-
-        #Check if has to get Service Console doc entries
-        if self.doc_type == SERVICECONSOLE or (self.doc_type == "all" and settings.get("serviceConsoleDoc") == True):
-            if not reference_cache.entries_by_doc_type.get(SERVICECONSOLE):
-                self.__get_serviceconsole_doc();
+        while not self.queue.empty():
+            self.queue.get().start()
 
         if(self.open_when_done):
-            #Check what kind of docs has to show
-            if (self.doc_type == "all"):
+            self.queue.join()
+            if self.doc_type == "*":
                 self.window.show_quick_panel(reference_cache.titles, self.open_documentation)
-            elif (self.doc_type == APEX):
-                self.window.show_quick_panel(reference_cache.titles_by_doc_type.get(APEX), self.open_documentation)
-            elif (self.doc_type == VISUALFORCE):
-                self.window.show_quick_panel(reference_cache.titles_by_doc_type.get(VISUALFORCE), self.open_documentation)
-            elif (self.doc_type == SERVICECONSOLE):
-                self.window.show_quick_panel(reference_cache.titles_by_doc_type.get(SERVICECONSOLE), self.open_documentation)
-
-    #Download SERVICE CONSOLE integration toolkit doc entries
-    def __get_serviceconsole_doc(self):
-        sf_html = urllib.request.urlopen(urllib.request.Request(SALESFORCE_SERVICECONSOLE_DOC_URL_BASE,None,{"User-Agent": "Mozilla/5.0"})).read().decode("utf-8")
-        page_soup = BeautifulSoup(sf_html, "html.parser")
-        reference_soup = page_soup.find_all("span", text=re.compile("Methods for \w"), class_="toc-text")
-        for reference in reference_soup:
-            span_list = reference.parent.parent.parent.find_all("span", class_="toc-text", text=re.compile("^(?!Methods for)"))
-            for span in span_list:
-                link = span.parent
-                reference_cache.append(
-                    SalesforceReferenceCacheEntry(
-                        span.string,
-                        link["href"],
-                        SERVICECONSOLE
-                    )
-                )
-
-    #Download VISUALFORCE doc entries
-    def __get_visualforce_doc(self):
-        sf_html = urllib.request.urlopen(urllib.request.Request(SALESFORCE_VISUALFORCE_DOC_URL_BASE,None,{"User-Agent": "Mozilla/5.0"})).read().decode("utf-8")
-        page_soup = BeautifulSoup(sf_html, "html.parser")
-        reference_soup = page_soup.find_all(text="Standard Component Reference",class_="toc-text")[0].parent.parent.parent
-        span_list = reference_soup.find_all("span", class_="toc-text")
-        for span in span_list:
-            link = span.parent
-            reference_cache.append(
-                    SalesforceReferenceCacheEntry(
-                        span.string,
-                        link["href"],
-                        VISUALFORCE
-                    )
-                )
-
-    #Download APEX doc entries
-    def __get_apex_doc(self):
-        sf_html = urllib.request.urlopen(urllib.request.Request(SALESFORCE_APEX_DOC_URL_BASE,None,{"User-Agent": "Mozilla/5.0"})).read().decode("utf-8")
-        page_soup = BeautifulSoup(sf_html, "html.parser")
-        reference_soup = page_soup.find_all(text="Reference",class_="toc-text")[0].parent.parent.next_sibling
-        leaf_soup_list = reference_soup.find_all(class_="leaf")
-        header_soup_list = map(lambda leaf: leaf.parent.previous_sibling,leaf_soup_list)
-        unique_header_soup_list = list()
-        for header_soup in header_soup_list:
-            if header_soup not in unique_header_soup_list:
-                unique_header_soup_list.append(header_soup)
-                header_data_tag = header_soup.find(class_="toc-a-block")
-                reference_cache.append(
-                    SalesforceReferenceCacheEntry(
-                        header_data_tag.find(class_="toc-text").string,
-                        header_data_tag["href"],
-                        APEX
-                    )
-                )
+            else:
+                self.window.show_quick_panel(reference_cache.titles_by_doc_type.get(self.doc_type.name), self.open_documentation)
 
     def open_documentation(self, reference_index):
         url = ""
         if(reference_index != -1):
-            if self.doc_type == APEX:
-                entry = reference_cache.apexEntries[reference_index]
-            elif self.doc_type == VISUALFORCE:
-                entry = reference_cache.visualforceEntries[reference_index]
-            elif self.doc_type == SERVICECONSOLE:
-                entry = reference_cache.serviceconsoleEntries[reference_index]
-            elif self.doc_type == "all":
+            if self.doc_type == "*":
                 entry = reference_cache[reference_index]
+            else:
+                entry = reference_cache.entries_by_doc_type.get(self.doc_type.name)[reference_index]
 
             if entry:
-                if entry.doc_type == APEX:
-                    url = SALESFORCE_APEX_DOC_URL_BASE + entry.url
-                elif entry.doc_type == VISUALFORCE:
-                    url = SALESFORCE_VISUALFORCE_DOC_URL_BASE + entry.url
-                elif entry.doc_type == SERVICECONSOLE:
-                    url = SALESFORCE_SERVICECONSOLE_DOC_URL_BASE + entry.url
+                url = self.doc_type.url + entry.url
 
             if url:
                 webbrowser.open_new_tab(url)

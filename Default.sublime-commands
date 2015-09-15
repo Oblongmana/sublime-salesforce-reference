@@ -1,18 +1,18 @@
 [
   {
-    "caption": "Salesforce Apex Reference",
-    "command": "salesforce_apex_reference"
+    "caption": "Salesforce Reference - Apex",
+    "command": "salesforce_reference_apex"
   },
   {
-    "caption": "Salesforce Visualforce Reference",
-    "command": "salesforce_visualforce_reference"
+    "caption": "Salesforce Reference - Visualforce",
+    "command": "salesforce_reference_visualforce"
   },
   {
-    "caption": "Salesforce Service Console Reference",
-    "command": "salesforce_service_console_reference"
+    "caption": "Salesforce Reference - Service Console",
+    "command": "salesforce_reference_service_console"
   },
   {
-    "caption": "Salesforce All Reference",
-    "command": "salesforce_all_reference"
+    "caption": "Salesforce Reference - All Documentation Types",
+    "command": "salesforce_reference_all_documentation_types"
   }
 ]
