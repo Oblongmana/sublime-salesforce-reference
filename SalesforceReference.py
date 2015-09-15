@@ -45,7 +45,7 @@ def plugin_loaded():
     global settings
     settings = sublime.load_settings("SublimeSalesforceReference.sublime-settings")
     if settings != None and settings.get("refreshCacheOnLoad") == True:
-        thread = RetrieveIndexThread(sublime.active_window(), "*", False)
+        thread = RetrieveIndexThread(sublime.active_window(), "*", open_when_done=False,sublime_opening_cache_refresh=True)
         thread.start()
         ThreadProgress(thread, "Retrieving Salesforce Reference Index...", "")
 
@@ -83,7 +83,7 @@ class RetrieveIndexThread(threading.Thread):
     A thread to run retrieval of the Saleforce Documentation index, or access the reference_cache
     """
 
-    def __init__(self, window, doc_type, open_when_done=True):
+    def __init__(self, window, doc_type, open_when_done=True, sublime_opening_cache_refresh=False):
         """
         :param window:
             An instance of :class:`sublime.Window` that represents the Sublime
@@ -99,6 +99,15 @@ class RetrieveIndexThread(threading.Thread):
             Whether this thread is being run solely for caching, or should open
             the documentation list for user selection when done. Defaults to
             true - should open the documentaton list when done
+        :param sublime_opening_cache_refresh:
+            flag indicating whether this is a cache refresh happening while
+            sublime is opening. Setting this to True causes special behaviour:
+             - open_when_done param will be set to False as this is not a user
+                initiated action, so opening the doc searcher would be jarring
+             - doc_type will be ignored - we will cache all the doc types we can,
+                however...
+             - if refreshCacheOnLoad is set to False in the settings for a
+                particular doc type, this doc type will not be cached
         """
         self.window = window
         if not isinstance(doc_type,DocType) and doc_type != "*":
@@ -110,6 +119,10 @@ class RetrieveIndexThread(threading.Thread):
                 )
         self.doc_type = doc_type
         self.open_when_done = open_when_done
+        self.sublime_opening_cache_refresh = sublime_opening_cache_refresh
+        if sublime_opening_cache_refresh:
+            self.doc_type = "*"
+            self.open_when_done = False
         self.queue = Queue()
         global reference_cache
         threading.Thread.__init__(self)
@@ -118,11 +131,15 @@ class RetrieveIndexThread(threading.Thread):
         cache_lock = threading.Lock()
 
         if self.doc_type == "*":
-            doc_type_settings = settings.get("docTypes")
             for doc_type in DocTypeEnum.get_all():
-                if (
-                        not doc_type_settings.get(doc_type.name.lower()).get('excludeFromAllDocumentationCommand')
+                doc_type_settings = settings.get("docTypes").get(doc_type.name.lower())
+                if  (
+                            not doc_type_settings.get("excludeFromAllDocumentationCommand")
                         and not reference_cache.entries_by_doc_type.get(doc_type.name)
+                        and not (
+                                        self.sublime_opening_cache_refresh
+                                    and not doc_type_settings.get("refreshCacheOnLoad")
+                                )
                     ):
                     self.queue.put(doc_type.preferred_strategy(self.window,reference_cache,cache_lock,self.queue.task_done))
         else:
