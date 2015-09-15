@@ -14,6 +14,7 @@ SublimeSalesforceReference adds multiple new commands to your palette:
   - `Salesforce Reference - Visualforce`
   - `Salesforce Reference - Service Console`
   - `Salesforce Reference - All Documentation Types` 
+
 Simply select one of these command, and the plugin will retrieve an index of reference pages from Salesforce and show them to you in a quick panel. Search for what you're after, press enter, and the documentation page will open in your web browser!
 
 Each of the commands is reasonably self-explanatory - the `Salesforce Reference - Apex` command shows the a list of Apex documentation pages, and so on; while the `Salesforce Reference - All Documentation Types` shows in a single list the documentation for all doc types this plugin supports.
@@ -88,9 +89,10 @@ Available commands for key bindings are:
  - `salesforce_reference_all_documentation_types`
 
 To set a key binding to one of these, go to `Preferences > Key Bindings - User`
-and insert something like this:
-``` json
+and insert something like this (for example):
+``` javascript
 {
+    //Example key binding
     "keys": ["alt+s"],
     "command": "salesforce_reference_all_documentation_types"
 }
