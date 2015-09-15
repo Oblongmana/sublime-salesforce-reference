@@ -1,6 +1,5 @@
 import collections
 from functools import total_ordering
-from itertools import groupby
 
 class SalesforceReferenceCache(collections.MutableSequence):
     """
@@ -33,8 +32,6 @@ class SalesforceReferenceCache(collections.MutableSequence):
 
     def __getitem__(self, key):
         return self.__entries[key]
-    # TODO: determine how adding and deleting affects the items cached in
-    #   __titles_by_doc_type and __entries_by_doc_type
     def __setitem__(self, key, value):
         self.__entries[key] = value
         self.__maintain_cache()
@@ -53,19 +50,27 @@ class SalesforceReferenceCache(collections.MutableSequence):
         self.__determine_titles()
     def __index_entries_by_doc_type(self):
         self.__entries_by_doc_type = {title_key: sorted(list(entry))
-                                        for title_key, entry in groupby(sorted(self.__entries),lambda entry: entry.doc_type)}
+                                        for title_key, entry in self.__groupby(sorted(self.__entries),lambda entry: entry.doc_type)}
     def __extract_titles_from_list(self,the_list):
         return list(map(lambda entry: entry.title,the_list))
     def __determine_titles(self):
         self.__titles = self.__extract_titles_from_list(self.__entries)
     def __index_titles_by_doc_type(self):
         self.__titles_by_doc_type = {title_key: self.__extract_titles_from_list(sorted(list(entry)))
-                                     for title_key, entry in groupby(sorted(self.__entries),lambda entry: entry.doc_type)}
+                                     for title_key, entry in self.__groupby(sorted(self.__entries),lambda entry: entry.doc_type)}
     #Return a list of entries filtered by doc_type and ordered by title
+    # TODO: can probably remove this
     def __filter_entries(self, doc_type):
         entries = [entry for entry in self.__entries if entry.doc_type == doc_type]
         entries.sort(key=lambda cacheEntry: cacheEntry.title)
         return entries
+    def __groupby(self, the_list, key=lambda x: x):
+        # From http://stackoverflow.com/a/15250161/157556
+        # itertools.groupby didn't play nice with custom sorting
+        d = collections.defaultdict(list)
+        for item in the_list:
+            d[key(item)].append(item)
+        return d.items()
 
     """str and repr implemented for debugging"""
     def __str__(self):
