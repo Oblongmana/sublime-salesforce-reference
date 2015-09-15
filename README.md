@@ -117,7 +117,7 @@ If you don't follow those instructions precisely, it's probably no big deal, we'
 If there's a documentation source you want to add, please open an issue for discussion on why it should be included. Note that no documentation sources have been deliberately excluded yet - time to implement is the primary constraint!
 
 Alternatively, if you want to have a go at adding it yourself, `salesforce_reference/retrieve.py` contains the necessary framework for doing so:
- - Create a new `DocRetrievalStrategy`, and add this to the `DocTypeEnum`, and `DocTypeEnum.get_all()`
+ - Create a new `DocRetrievalStrategy`, and add this to the `DocTypeEnum`, including modifying the `DocTypeEnum.get_all()` and `DocTypeEnum.get_by_name()` methods appropriately
  - Add settings for this to `SublimeSalesforceReference.sublime-settings`, under `docTypes`. Make sure the key you add to this is identical to the key you added in `DocTypeEnum`, but in lowercase
  - Add a new command in `SalesforceReference.py`, and create the command palette entry for it in `Default.sublime-commands`
 

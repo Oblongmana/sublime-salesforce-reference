@@ -142,12 +142,15 @@ class RetrieveIndexThread(threading.Thread):
         url = ""
         if(reference_index != -1):
             if self.doc_type == "*":
-                entry = reference_cache[reference_index]
+                entry = reference_cache.entries[reference_index]
             else:
                 entry = reference_cache.entries_by_doc_type.get(self.doc_type.name)[reference_index]
 
             if entry:
-                url = self.doc_type.url + entry.url
+                if self.doc_type == "*":
+                    url = DocTypeEnum.get_by_name(entry.doc_type).url + entry.url
+                else:
+                    url = self.doc_type.url + entry.url
 
             if url:
                 webbrowser.open_new_tab(url)

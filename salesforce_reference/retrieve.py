@@ -174,3 +174,11 @@ class DocTypeEnum:
             DocTypeEnum.APEX,
             DocTypeEnum.SERVICECONSOLE
         ]
+    @staticmethod
+    def get_by_name(name):
+        if name == DocTypeEnum.VISUALFORCE.name:
+            return DocTypeEnum.VISUALFORCE
+        elif name == DocTypeEnum.APEX.name:
+            return DocTypeEnum.APEX
+        elif name == DocTypeEnum.SERVICECONSOLE.name:
+            return DocTypeEnum.SERVICECONSOLE
