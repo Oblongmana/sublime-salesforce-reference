@@ -75,8 +75,20 @@ and insert something like this:
 
 If you have any suggestions or bugs to report, please open an issue and I'll take a look ASAP. If you have any questions or would like to contribute in any way, you can also get in touch with me by tweeting [@Oblongmana](http://twitter.com/oblongmana), or go ahead and fork the repo and submit a pull request.
 
+Please note that we will roughly be following semver + git-flow for 1.4.0 onwards. The short version of that is - new branches should be made off the `develop` branch like so:
+ - `fix/describe-your-fix` for bug fixes
+ - `feature/describe-your-feature` for new features
+ - `chore/describe-your-chore` for new things like minor documentation updates
+Once complete, merge any remote changes to the `develop` branch into your local branch, and submit a pull request against the `develop` branch
+
+When we're ready for a release, a release candidate will be branched off `develop` into `release-X.Y.Z` (`X.Y.Z` being the version number). This branch will be open to fixes only, no new features. Other maintenance things like release note changes, doc tweaks, will be accepted only if relevant to the release. Once complete, the release branch will be merged into master, tagged, and shipped.
+
+If you don't follow those instructions precisely, it's probably no big deal, we'll try to make it work, but it may take longer or be more of a challenge.
+
+
 ## License
 
+### Sublime Salesforce Reference
 Copyright (c) 2014-2015 James Hill <oblongmana@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -93,6 +105,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+### ThreadProgress.py
 ThreadProgress.py is licensed under the MIT license, and SalesforceReference.py's RetrieveIndexThread method derives in part from code under the same license
 
 Copyright (c) 2011-2013 Will Bond <will@wbond.net>
@@ -107,5 +120,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ## Credits
 
 All Salesforce Documentation is © Copyright 2000–2015 salesforce.com, inc.
+
+Thanks to [Marco Zeuli](https://github.com/maaaaarco) for his contributions to making extra types of documentation available in the plugin
 
 Credit to [Luke McFarlane](https://github.com/lukemcfarlane) for the inspiration!
