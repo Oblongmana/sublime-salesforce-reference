@@ -1,0 +1,51 @@
+Sublime Salesforce Reference 2.0.0 Release Notes:
+
+This release adds new types of documentation - so not only do you have access
+to Apex doc, you can now access Visualforce and Service Console docs!
+
+This is marked as a major release, due to some changes that could potentially
+break some configuration for existing users. This will be very minor - only a
+renamed command. See the end of these release notes for details.
+
+
+Enhancements:
+  - Add new documentation types (thanks to Marco Zeuli
+     [https://github.com/maaaaarco]) for his significant contribution to this
+     feature. Each documentation type is available individually under new
+     commands, and will present a list of links that open in browser, just
+     like the old command:
+    + "Salesforce Reference - Apex"
+    + "Salesforce Reference - Visualforce"
+    + "Salesforce Reference - Service Console"
+    + "Salesforce Reference - All Documentation Types": this special command
+        shows a list containing all of the documentation links for all of the
+        different documentation types, mashed into one single list.
+
+  - Each of the new documentation types has corresponding settings in your
+     settings file (`Preferences > Package Settings > Salesforce Reference >
+     Settings - User` - copy from `Settings - Default` if these are missing).
+     For each documentation type, you can control:
+    + `refreshCacheOnLoad`: the top level `refreshCacheOnLoad` setting still
+        controls whether to retrieve and cache documentation at all during
+        Sublime startup, but during that process, the plugin will check each
+        `docType`s setting to see whether a specific Documentation type gets
+        cached during startup or not (the default is to cache Apex and
+        Visualforce during startup, but not Service Console).
+    + `excludeFromAllDocumentationCommand`: if you set this to true for a
+        particular `docType` - the "Salesforce Reference - All Documentation
+        Types" command will exclude this doc type from its list.
+
+  - Threading has been improved to support this new system - doc retrieval jobs
+     can run at the same time, important for retrieving multiple docs at once.
+     This is not likely to have significant impact on you - the end user - but
+     it's nice to have, trust us :D
+
+Breaking Changes:
+  - The old "Salesforce Reference" command (`salesforce_reference`) no longer
+     exists. The equivalent new command is "Salesforce Reference - Apex"
+     (`salesforce_reference_apex`) - as the old command only retrieved Apex
+     documentation.
+    + This change should only be important for users who have set up a key
+        binding for the command - if that's you, simply replace
+        `salesforce_reference` with `salesforce_reference_apex` in your key
+        bindings

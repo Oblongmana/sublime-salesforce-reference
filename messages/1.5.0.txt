@@ -1,5 +1,0 @@
-Sublime Salesforce Reference 1.5.0 Release Notes:
-
-Enhancements:
-  - Add other docs
-    - TODO: flesh this out

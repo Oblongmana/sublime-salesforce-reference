@@ -100,7 +100,7 @@ and insert something like this:
 
 If you have any suggestions or bugs to report, please open an issue and I'll take a look ASAP. If you have any questions or would like to contribute in any way, you can also get in touch with me by tweeting [@Oblongmana](http://twitter.com/oblongmana), or go ahead and fork the repo and submit a pull request.
 
-Please note that we will roughly be following semver + git-flow for 1.4.0 onwards. The short version of that is - new branches should be made off the `develop` branch like so:
+Please note that we will roughly be following semver + git-flow for 2.0.0 onwards. The short version of that is - new branches should be made off the `develop` branch like so:
  - `fix/describe-your-fix` for bug fixes
  - `feature/describe-your-feature` for new features
  - `chore/describe-your-chore` for new things like minor documentation updates
