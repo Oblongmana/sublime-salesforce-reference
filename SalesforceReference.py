@@ -29,8 +29,11 @@ def plugin_loaded():
     settings = sublime.load_settings("SublimeSalesforceReference.sublime-settings")
     if settings != None and settings.get("refreshCacheOnLoad") == True:
         thread = RetrieveIndexThread(sublime.active_window(), "*", open_when_done=False,sublime_opening_cache_refresh=True)
+        print("SublimeSalesforceReference: Startup caching will begin shortly")
         thread.start()
-        ThreadProgress(thread, "Retrieving Salesforce Reference Index...", "")
+    else:
+        print("SublimeSalesforceReference: refreshCacheOnLoad is False, or "
+              "settings file missing. Skipping startup caching")
 
 # Command to retrieve Apex reference
 class SalesforceReferenceApexCommand(sublime_plugin.WindowCommand):
