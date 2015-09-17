@@ -5,7 +5,7 @@ A plugin for Sublime Text that gives you quick access to Salesforce Documentatio
 ## Installation
 
 1. **Recommended:** Download [Package Control](http://wbond.net/sublime_packages/package_control) and install using the *Package Control: Install Package* command (search for *Salesforce Reference*)
-2. **Not recommended:** Simply download this repo and save it to a *SublimeSalesforceReference* directory inside your Sublime Packages/ directory. You will not receive automatic updates as you would following option 1
+2. **Not recommended:** Clone the repo or download a release at https://github.com/Oblongmana/sublime-salesforce-reference, and save it to a *SublimeSalesforceReference* directory inside your Sublime Packages/ directory. You will not receive automatic updates as you would following option 1
 
 ## Usage 
 
