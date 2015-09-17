@@ -1,0 +1,10 @@
+Sublime Salesforce Reference 2.0.2 Release Notes:
+
+Please note that some users have experienced some oddities updating to the 
+latest version. If you have any issues, try restarting Sublime Text, and
+failing that - uninstall, and then reinstall Salesforce Reference. If you
+continue to have issues, please log an issue at 
+https://github.com/Oblongmana/sublime-salesforce-reference
+
+Bug Fixes:
+ - Fix trailing comma on update messages mapping file, causing parse issue
