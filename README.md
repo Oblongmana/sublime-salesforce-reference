@@ -5,7 +5,7 @@ A plugin for Sublime Text that gives you quick access to Salesforce Documentatio
 ## Installation
 
 1. **Recommended:** Download [Package Control](http://wbond.net/sublime_packages/package_control) and install using the *Package Control: Install Package* command (search for *Salesforce Reference*)
-2. **Not recommended:** Simply download this repo and save it to a *SublimeSalesforceReference* directory inside your Sublime Packages/ directory. You will not receive automatic updates as you would following option 1
+2. **Not recommended:** Clone the repo or download a release at https://github.com/Oblongmana/sublime-salesforce-reference, and save it to a *SublimeSalesforceReference* directory inside your Sublime Packages/ directory. You will not receive automatic updates as you would following option 1
 
 ## Usage 
 
@@ -15,7 +15,7 @@ SublimeSalesforceReference adds multiple new commands to your palette:
   - `Salesforce Reference - Service Console`
   - `Salesforce Reference - All Documentation Types` 
 
-Simply select one of these command, and the plugin will retrieve an index of reference pages from Salesforce and show them to you in a quick panel. Search for what you're after, press enter, and the documentation page will open in your web browser!
+Simply select one of these commands, and the plugin will retrieve an index of reference pages from Salesforce and show them to you in a quick panel. Search for what you're after, press enter, and the documentation page will open in your web browser!
 
 Each of the commands is reasonably self-explanatory - the `Salesforce Reference - Apex` command shows the a list of Apex documentation pages, and so on; while the `Salesforce Reference - All Documentation Types` shows in a single list the documentation for all doc types this plugin supports.
 

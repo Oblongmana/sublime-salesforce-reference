@@ -5,11 +5,27 @@ A plugin for Sublime Text that gives you quick access to Salesforce Documentatio
 ## Installation
 
 1. **Recommended:** Download [Package Control](http://wbond.net/sublime_packages/package_control) and install using the *Package Control: Install Package* command (search for *Salesforce Reference*)
-2. **Not recommended:** Simply download this repo and save it to a *SublimeSalesforceReference* directory inside your Sublime Packages/ directory. You will not receive automatic updates as you would following option 1
+2. **Not recommended:** Clone the repo or download a release at https://github.com/Oblongmana/sublime-salesforce-reference, and save it to a *SublimeSalesforceReference* directory inside your Sublime Packages/ directory. You will not receive automatic updates as you would following option 1
 
 ## Usage 
 
-SublimeSalesforceReference adds a new command to your palette: *'Salesforce Reference'*. Simply select this command, and wait for a few moments for the plugin to retrieve an index of reference pages from Salesforce. At this point, a quick panel will pop up list documentation options; search for what you're after, press enter, and the documentation page will open in your web browser
+SublimeSalesforceReference adds multiple new commands to your palette:
+  - `Salesforce Reference - Apex`
+  - `Salesforce Reference - Visualforce`
+  - `Salesforce Reference - Service Console`
+  - `Salesforce Reference - All Documentation Types` 
+
+Simply select one of these commands, and the plugin will retrieve an index of reference pages from Salesforce and show them to you in a quick panel. Search for what you're after, press enter, and the documentation page will open in your web browser!
+
+
+## Settings
+
+See `Preference > Package Settings > Salesforce Reference` for available/default settings.
+
+By default, when Sublime Text starts up, the plugin will make a callout to cache the Salesforce Reference Index for the `Apex` and `Visualforce` documentation, so that when you run a `Salesforce Reference` command, the list of reference pages will open instantly without making an http callout. You can customise this behaviour per documentation type using `refreshCacheOnLoad`
+
+You can exclude specific documentation types from the `All Documentation Types` command by changing the `excludeFromAllDocumentationCommand` setting per documentation type.
+
 
 ## License
 
