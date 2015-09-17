@@ -1,7 +1,7 @@
 import collections
 from functools import total_ordering
 
-class SalesforceReferenceCache(collections.MutableSequence):
+class SalesforceReferenceCache(collections.MutableSequence,collections.MutableSet):
     """
     A cache of SalesforceReferenceEntry objects, sorted by Title. This order
     will be maintained throughout append operations
@@ -32,17 +32,21 @@ class SalesforceReferenceCache(collections.MutableSequence):
 
     def __getitem__(self, key):
         return self.__entries[key]
-    def __setitem__(self, key, value):
-        self.__entries[key] = value
-        self.__maintain_cache()
+    def __setitem__(self, key, item):
+        # Enforce set behaviour
+        if item not in self.__entries:
+            self.__entries[key] = item
+            self.__maintain_cache()
     def __delitem__(self, key):
         del self.__entries[key]
         self.__maintain_cache()
     def __len__(self):
         return len(self.__entries)
-    def insert(self, key,val):
-        self.__entries.insert(key,val)
-        self.__maintain_cache()
+    def insert(self, key, item):
+        # Enforce set behaviour
+        if item not in self.__entries:
+            self.__entries.insert(key,item)
+            self.__maintain_cache()
     def __maintain_cache(self):
         self.__entries.sort()
         self.__index_entries_by_doc_type()
@@ -65,6 +69,18 @@ class SalesforceReferenceCache(collections.MutableSequence):
         for item in the_list:
             d[key(item)].append(item)
         return d.items()
+
+    """MutableSet methods"""
+    def add(self,item):
+        if item not in self.__entries:
+            self.__entries.append(item)
+            self.__maintain_cache()
+    def discard(self,item):
+        try:
+            del self.__entries[self.__entries.index(item)]
+            self.__maintain_cache()
+        except ValueError:
+            pass
 
     """str and repr implemented for debugging"""
     def __str__(self):
