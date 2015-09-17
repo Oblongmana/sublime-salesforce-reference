@@ -1,25 +1,31 @@
 Sublime Salesforce Reference 2.0.0 Release Notes:
 
 This release adds new types of documentation - so not only do you have access
-to Apex doc, you can now access Visualforce and Service Console docs!
+to Apex doc, you can now access Visualforce and Service Console docs! This
+release also adds a command to show all types of documentation at once, and
+provides new settings for configuring which documentation types get
+automatically cache, and allows you to exclude specific documentation types from
+the new "All Documentation" command.
 
-This is marked as a major release, due to some changes that could potentially
-break some configuration for existing users. This will be very minor - only a
-renamed command. See the end of these release notes for details.
+This is marked as a major release, due to a change that could potentially break
+custom key bindings for existing users. This won't affect most users, but see
+the end of these release notes for details if this affects you.
+
+If you run into any issues, please tweet @Oblongmana, or log an issue on github
+at https://github.com/Oblongmana/sublime-salesforce-reference/issues
 
 
 Enhancements:
   - Add new documentation types (thanks to Marco Zeuli
-     [https://github.com/maaaaarco]) for his significant contribution to this
-     feature. Each documentation type is available individually under new
-     commands, and will present a list of links that open in browser, just
-     like the old command:
+     [https://github.com/maaaaarco] for his significant contribution to this
+     feature). Each documentation type is available as a list under new
+     commands - functioning just like the old command:
     + "Salesforce Reference - Apex"
     + "Salesforce Reference - Visualforce"
     + "Salesforce Reference - Service Console"
     + "Salesforce Reference - All Documentation Types": this special command
-        shows a list containing all of the documentation links for all of the
-        different documentation types, mashed into one single list.
+        shows a list containing all documentation links for all documentation
+        types, mashed into a single list.
 
   - Each of the new documentation types has corresponding settings in your
      settings file (`Preferences > Package Settings > Salesforce Reference >
