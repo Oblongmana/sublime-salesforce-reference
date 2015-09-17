@@ -115,14 +115,26 @@ class RetrieveIndexThread(threading.Thread):
 
     def run(self):
         if self.doc_type == "*":
+            all_doc_type_settings = settings.get("docTypes")
             for doc_type in DocTypeEnum.get_all():
-                doc_type_settings = settings.get("docTypes").get(doc_type.name.lower())
+                if all_doc_type_settings is None:
+                    specific_doc_type_settings = None
+                else:
+                    specific_doc_type_settings = all_doc_type_settings.get(doc_type.name.lower())
+
+                if specific_doc_type_settings is None:
+                    exclude = False
+                    refresh_on_load = False
+                else:
+                    exclude = specific_doc_type_settings.get("excludeFromAllDocumentationCommand")
+                    refresh_on_load = specific_doc_type_settings.get("refreshCacheOnLoad")
+
                 if  (
-                            not doc_type_settings.get("excludeFromAllDocumentationCommand")
+                            not exclude
                         and not reference_cache.entries_by_doc_type.get(doc_type.name)
                         and not (
                                         self.sublime_opening_cache_refresh
-                                    and not doc_type_settings.get("refreshCacheOnLoad")
+                                    and not refresh_on_load
                                 )
                     ):
                     self.queue.put(doc_type.preferred_strategy(self.window,reference_cache,cache_lock,self.queue.task_done))
