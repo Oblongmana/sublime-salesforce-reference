@@ -1,0 +1,7 @@
+Sublime Salesforce Reference 2.0.1 Release Notes:
+
+Bug Fixes:
+ - Add some extra settings checking, as this caused exceptions if the settings
+   file was missing
+ - Add `.no-sublime-package` file to plugin, to avoid issues with loading
+   dependencies into the main plugin
