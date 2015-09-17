@@ -1,5 +1,5 @@
 """SublimeSalesforceReference: Quick access to Salesforce Documentation from Sublime Text"""
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 __author__ = "James Hill <me@jameshill.io>"
 __copyright__ = "SublimeSalesforceReference: (C) 2014-2015 James Hill. GNU GPL 3."
 __credits__ = ["All Salesforce Documentation is © Copyright 2000–2015 salesforce.com, inc.", "ThreadProgress.py is under the MIT License, Will Bond <will@wbond.net>, and SalesforceReference.py's RetrieveIndexThread method is a derives in part from code under the same license"]
