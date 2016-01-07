@@ -162,9 +162,9 @@ class RetrieveIndexThread(threading.Thread):
 
             if entry:
                 if self.doc_type == "*":
-                    url = DocTypeEnum.get_by_name(entry.doc_type).url + entry.url
+                    url = DocTypeEnum.get_by_name(entry.doc_type).doc_base_url + entry.url
                 else:
-                    url = self.doc_type.url + entry.url
+                    url = self.doc_type.doc_base_url + entry.url
 
             if url:
                 webbrowser.open_new_tab(url)
