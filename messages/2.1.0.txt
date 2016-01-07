@@ -1,0 +1,12 @@
+Sublime Salesforce Reference 2.1.0 Release Notes:
+
+Re-engineering:
+  - Modify Table of Contents retrieval to new JSON Table of Contents
+    - Possible impact will be a _slightly_ faster retrieval speed, as we're
+      retrieving a dedicated ToC instead of a full HTML page
+    - Salesforce's doc portal has moved to an angular app, which in short -
+      means the previous scraping approach has broken.
+      Some further digging in the angular app's source turned up the new JSON
+      ToC, hence our re-engineering to use these instead of scraping.
+      For a more technical explanation see commit notes here:
+      https://github.com/Oblongmana/sublime-salesforce-reference/commit/834ed1d1d03e7436fab2448a023056e7d7efd98f

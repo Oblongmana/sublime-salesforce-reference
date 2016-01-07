@@ -1,5 +1,5 @@
 """SublimeSalesforceReference: Quick access to Salesforce Documentation from Sublime Text"""
-__version__ = "2.0.2"
+__version__ = "2.1.0"
 __author__ = "James Hill <me@jameshill.io>"
 __copyright__ = "SublimeSalesforceReference: (C) 2014-2015 James Hill. GNU GPL 3."
 __credits__ = ["All Salesforce Documentation is © Copyright 2000–2015 salesforce.com, inc.", "ThreadProgress.py is under the MIT License, Will Bond <will@wbond.net>, and SalesforceReference.py's RetrieveIndexThread method is a derives in part from code under the same license"]
@@ -162,9 +162,9 @@ class RetrieveIndexThread(threading.Thread):
 
             if entry:
                 if self.doc_type == "*":
-                    url = DocTypeEnum.get_by_name(entry.doc_type).url + entry.url
+                    url = DocTypeEnum.get_by_name(entry.doc_type).doc_base_url + entry.url
                 else:
-                    url = self.doc_type.url + entry.url
+                    url = self.doc_type.doc_base_url + entry.url
 
             if url:
                 webbrowser.open_new_tab(url)
