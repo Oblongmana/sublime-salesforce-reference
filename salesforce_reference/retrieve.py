@@ -82,7 +82,8 @@ class ApexDocJsonTocBasedStrategy(DocRetrievalStrategy):
             sf_document = urllib.request.urlopen(urllib.request.Request(DocTypeEnum.APEX.toc_url,None,{"User-Agent": "Mozilla/5.0"})).read().decode("utf-8")
             sf_json = json.loads(sf_document)
             sf_toc = sf_json["toc"]
-            reference_toc = filter(lambda x: "id" in x and x["id"] == "apex_reference", sf_toc)
+            dev_guide_toc = next(filter(lambda x: "id" in x and x["id"] == "apex_dev_guide", sf_toc))
+            reference_toc = filter(lambda x: "id" in x and x["id"] == "apex_reference", dev_guide_toc["children"])
             for toc_entry in getAllTocLeafParents(next(reference_toc),None):
                 with self.cache_lock:
                     self.cache.append(
