@@ -1,0 +1,4 @@
+Sublime Salesforce Reference 2.1.1 Release Notes:
+
+Bug Fixes:
+  - Updated Apex retrieval to handle Salesforce's new Apex ToC format (as at 2017-06-30)
